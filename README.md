@@ -43,6 +43,7 @@ UniMind Web provides a user-friendly interface built with React and Supabase. Us
 *   **Routing:** React Router DOM
 
 ## :file_folder: Project Structure
+```
 ├── public/ # Static assets
 ├── src/
 │ ├── components/ # Reusable UI components (e.g., modals)
@@ -60,6 +61,7 @@ UniMind Web provides a user-friendly interface built with React and Supabase. Us
 ├── tailwind.config.js # Tailwind CSS configuration
 ├── postcss.config.js # PostCSS configuration
 └── README.md # This file
+```
 
 ## :gear: Setup and Installation
 
