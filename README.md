@@ -72,7 +72,7 @@ UniMind Web provides a user-friendly interface built with React and Supabase. Us
 
 2.  **Clone the Repository**:
     ```bash
-    git clone git@github.com:<ryantigi254>/unimind.git
+    git clone git@github.com:ryantigi254/UniMind.git
     cd unimind
     ```
 
