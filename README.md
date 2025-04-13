@@ -108,6 +108,3 @@ UniMind Web provides a user-friendly interface built with React and Supabase. Us
 
 *   **Backend:** This web application is designed to potentially interact with the [AI-Mental-Health-Chatbot](https://github.com/ryantigi254/AI-Mental-Health-Chatbot) (Rasa) project, which would handle the core conversational AI logic.
 *   **Native App:** It serves a similar purpose to the [Mental-Health-Chatbot-App](https://github.com/ryantigi254/Mental-Health-Chatbot-App) but is web-based and relies on cloud services (Supabase, netlify) rather than running entirely on-device.
-
-
-

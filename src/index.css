@@ -1,0 +1,41 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply antialiased;
+  }
+
+  /* Set heading colors for dark mode */
+  .dark h1,
+  .dark h2,
+  .dark h3,
+  .dark h4,
+  .dark h5,
+  .dark h6,
+  .dark .section-title {
+    @apply text-white;
+  }
+}
+
+.dark {
+  color-scheme: dark;
+}
+
+/* Auth UI Customization */
+.auth-container {
+  @apply w-full;
+}
+
+.auth-button {
+  @apply w-full px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg transition-colors !important;
+}
+
+.auth-input {
+  @apply w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent !important;
+}
+
+.auth-label {
+  @apply block text-sm font-medium text-gray-300 mb-1 !important;
+}
