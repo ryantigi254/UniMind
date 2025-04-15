@@ -21,6 +21,12 @@ function App() {
       window.matchMedia('(prefers-color-scheme: dark)').matches);
 
   return (
+    // Return a simple element for testing
+    <div>
+      <h1>Hello Test</h1>
+    </div>
+
+    /* Original code commented out for debugging
     <div className={isDark ? 'dark' : ''}>
       <Router>
         <Routes>
@@ -51,6 +57,7 @@ function App() {
         </Routes>
       </Router>
     </div>
+    */
   );
 }
 
