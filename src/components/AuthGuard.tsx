@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
 import { useStore } from '../store';
 
 interface AuthGuardProps {
@@ -9,33 +8,22 @@ interface AuthGuardProps {
 
 const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
   const navigate = useNavigate();
-  const { setUser } = useStore();
+  const { session, setUser } = useStore();
 
   useEffect(() => {
-    // Check current session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) {
+    if (session === null) {
+      if (window.location.pathname !== '/auth') {
         navigate('/auth');
-      } else {
+      }
+    } else if (session?.user) {
+      const currentUser = useStore.getState().user;
+      if (currentUser?.id !== session.user.id) {
         setUser(session.user);
       }
-    });
+    }
+  }, [session, navigate, setUser]);
 
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!session) {
-        navigate('/auth');
-      } else {
-        setUser(session.user);
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [navigate, setUser]);
-
-  return <>{children}</>;
+  return session ? <>{children}</> : null;
 };
 
 export default AuthGuard;
