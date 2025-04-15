@@ -110,18 +110,6 @@ const SettingsPage = () => {
   const [captchaError, setCaptchaError] = useState<string | null>(null);
   const captchaRef = useRef<HCaptcha>(null);
 
-  // Define base styles for reusable components
-  const inputStyles = {
-    inputWrapper: "bg-gray-700 group-data-[hover=true]:bg-gray-600 group-data-[focus=true]:bg-gray-600",
-    label: "text-gray-400",
-    input: "text-white placeholder-gray-500",
-    description: "text-gray-500 text-xs pt-1",
-  };
-  const textAreaStyles = {
-    ...inputStyles, // Inherit base styles
-    innerWrapper: "resize-vertical", // Allow vertical resizing
-  };
-
   // Personalisation state (spelling corrected)
   const [nickname, setNickname] = useState('');
   const [userRole, setUserRole] = useState('');
@@ -198,11 +186,6 @@ const SettingsPage = () => {
       setIsPhoneNumberValid(false);
     }
   }, [user]);
-
-  // Ensure phone input syncs when user object changes
-  useEffect(() => {
-    setNewPhoneNumber(user?.phone ?? '');
-  }, [user?.phone]);
 
   const handleThemeChange = (theme: 'light' | 'dark' | 'system') => {
     updateSettings({ theme });
@@ -426,13 +409,7 @@ const SettingsPage = () => {
         if (error) {
           throw error;
         }
-        setPersonalisationSuccess('Personalisation saved successfully!'); 
         toast.success('Personalisation saved successfully!');
-        // Clear fields after successful Supabase save
-        setNickname('');
-        setUserRole('');
-        setBotTraits('');
-        setOtherInfo('');
       } catch (error: any) {
         console.error('Error saving personalisation to DB:', error);
         toast.error(`Failed to save personalisation: ${error.message}`);
@@ -453,11 +430,6 @@ const SettingsPage = () => {
          localStorage.setItem('anonymousPersonalisation', JSON.stringify(localData));
          toast.success('Personalisation saved locally.');
          setPersonalisationSuccess('Settings saved locally.');
-         // Clear fields after successful local save
-         setNickname('');
-         setUserRole('');
-         setBotTraits('');
-         setOtherInfo('');
        } catch (error) {
           console.error('Error saving personalisation locally:', error);
           toast.error('Could not save personalisation locally.');
@@ -566,9 +538,9 @@ const SettingsPage = () => {
                         placement="top"
                         delay={0}
                         closeDelay={0}
-                        className="bg-gray-900 text-white text-xs px-2 py-1 rounded border border-gray-700 shadow-lg"
+                        className="bg-gray-900 text-white text-xs px-2 py-1 rounded border border-gray-700"
                     >
-                        <Info size={16} className="text-gray-400 hover:text-gray-200 cursor-pointer transition-colors" />
+                        <Info size={16} className="text-gray-400 cursor-pointer" />
                     </Tooltip>
                  </div>
                   <div className="flex items-start gap-3">
@@ -697,33 +669,28 @@ const SettingsPage = () => {
         );
       case 'personalisation':
         return (
-          <form onSubmit={handleSavePersonalisation} className="space-y-6">
-            <div className="flex items-center justify-between mb-8"> 
+          <form onSubmit={handleSavePersonalisation} className="space-y-5">
+            <Switch
+              isSelected={enableMemory}
+              onValueChange={setEnableMemory}
+              size="sm"
+            >
               <div className="flex items-center gap-2">
-                <span className="text-gray-200">Enable Conversation Memory</span> 
+                Enable Conversation Memory
                 <Tooltip
                     content="Allow the bot to remember previous messages in this session."
                     placement="top"
                     delay={0}
                     closeDelay={0}
-                    className="bg-gray-900 text-white text-xs px-2 py-1 rounded border border-gray-700 shadow-lg"
+                    className="bg-gray-900 text-white text-xs px-2 py-1 rounded border border-gray-700"
                  >
-                     <Info size={18} className="text-gray-400 hover:text-gray-200 cursor-help transition-colors" />
+                     <Info size={16} className="text-gray-400 cursor-help" />
                  </Tooltip>
               </div>
-              <Switch
-                isSelected={enableMemory}
-                onValueChange={setEnableMemory}
-                size="md"
-                color="secondary"
-                classNames={{
-                  wrapper: 'group-data-[selected=true]:bg-[rgb(255,0,122)]'
-                }}
-              >
-              </Switch>
-            </div>
+            </Switch>
 
-            <div className="space-y-1">
+            {/* Input fields */}
+            <div>
               <Input
                 label="What should UniMind call you?"
                 value={nickname}
@@ -733,7 +700,7 @@ const SettingsPage = () => {
                 classNames={inputStyles}
               />
             </div>
-             <div className="space-y-1">
+             <div>
               <Textarea
                 label="What do you do?"
                 value={userRole}
@@ -744,7 +711,7 @@ const SettingsPage = () => {
                 minRows={1}
               />
             </div>
-             <div className="space-y-1">
+             <div>
               <Textarea
                 label="What traits should UniMind have?"
                 value={botTraits}
@@ -755,7 +722,7 @@ const SettingsPage = () => {
                  minRows={2}
               />
             </div>
-             <div className="space-y-1">
+             <div>
               <Textarea
                 label="Anything else UniMind should know?"
                 value={otherInfo}
@@ -767,15 +734,17 @@ const SettingsPage = () => {
               />
             </div>
 
-            <div className="flex flex-col items-center gap-2 pt-4">
+            {/* Save Button and Messages */}
+            <div className="flex flex-col items-center gap-2 pt-2">
                 <Button
                     type="submit"
-                    color="secondary"
-                    className="font-semibold w-full h-11 bg-[rgb(255,0,122)] hover:bg-[rgb(220,0,105)] text-white shadow-lg shadow-[rgb(255,0,122)]/50 rounded-xl"
-                    isLoading={loadingPersonalisation}
+                    color="secondary" // Use pink color
+                    className="font-semibold w-full h-11"
+                    isLoading={loadingPersonalisation} // <-- Add isLoading prop
                 >
-                    {loadingPersonalisation ? 'Saving...' : 'Save Personalisation'}
+                    {loadingPersonalisation ? 'Saving...' : 'Save Personalisation'} {/* Change text when loading */}
                 </Button>
+                {/* Display Success/Error messages */} 
                 {personalisationSuccess && (
                     <p className="text-sm text-green-500 mt-2 text-center">{personalisationSuccess}</p>
                 )}
@@ -798,7 +767,7 @@ const SettingsPage = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-5xl">
+    <div className="container mx-auto px-4 py-8 max-w-4xl">
       <h1 className="text-3xl font-bold mb-8 text-white">Settings</h1>
       
       <div className="flex flex-col md:flex-row gap-8">

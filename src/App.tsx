@@ -9,7 +9,6 @@ import MoodTrackerPage from './pages/MoodTrackerPage';
 import JournalPage from './pages/JournalPage';
 import SettingsPage from './pages/SettingsPage';
 import InfoPage from './pages/InfoPage';
-import CompanionPage from './pages/CompanionPage';
 import DisclaimerModal from './components/DisclaimerModal';
 import { useStore } from './store';
 
@@ -42,7 +41,6 @@ function App() {
                       <Route path="/journal" element={<JournalPage />} />
                       <Route path="/settings" element={<SettingsPage />} />
                       <Route path="/info" element={<InfoPage />} />
-                      <Route path="/companion" element={<CompanionPage />} />
                       <Route path="*" element={<Navigate to="/" replace />} />
                     </Routes>
                   </Layout>
