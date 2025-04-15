@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
 import AuthGuard from './components/AuthGuard';
@@ -11,14 +11,40 @@ import SettingsPage from './pages/SettingsPage';
 import InfoPage from './pages/InfoPage';
 import DisclaimerModal from './components/DisclaimerModal';
 import { useStore } from './store';
+import { supabase } from './lib/supabase';
+import { Session, AuthChangeEvent } from '@supabase/supabase-js';
 
 function App() {
+  console.log('App component rendering...');
   const { settings, disclaimerStatus } = useStore();
+  const [session, setSession] = useState<Session | null>(null);
+
+  useEffect(() => {
+    console.log('App useEffect: Initial check for session...');
+    supabase.auth.getSession().then(({ data: { session: initialSession } }) => {
+      console.log('App useEffect: getSession result:', initialSession);
+      setSession(initialSession);
+    });
+
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (_event: AuthChangeEvent, currentSession: Session | null) => {
+        console.log('App useEffect: onAuthStateChange triggered. Event:', _event, 'New session:', currentSession);
+        setSession(currentSession);
+      }
+    );
+
+    return () => {
+      console.log('App useEffect: Cleaning up auth listener.');
+      authListener?.subscription?.unsubscribe();
+    };
+  }, []);
 
   const isDark =
     settings.theme === 'dark' ||
     (settings.theme === 'system' &&
       window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+  console.log('App component: Calculated isDark:', isDark, 'Session state:', session);
 
   return (
     <div className={isDark ? 'dark' : ''}>
@@ -30,8 +56,8 @@ function App() {
           <Route
             path="/*"
             element={
-              <AuthGuard>
-                {!disclaimerStatus.accepted ? (
+              session ? (
+                !disclaimerStatus.accepted ? (
                   <DisclaimerModal />
                 ) : (
                   <Layout>
@@ -44,8 +70,10 @@ function App() {
                       <Route path="*" element={<Navigate to="/" replace />} />
                     </Routes>
                   </Layout>
-                )}
-              </AuthGuard>
+                )
+              ) : (
+                session === null ? <Navigate to="/auth" replace /> : <div>Loading Session...</div>
+              )
             }
           />
         </Routes>
