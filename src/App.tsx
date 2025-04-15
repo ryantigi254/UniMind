@@ -27,8 +27,6 @@ function App() {
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/terms" element={<TermsPage />} />
           
-          {/* Keep protected routes commented out for now */}
-          {/*
           <Route
             path="/*"
             element={
@@ -50,7 +48,6 @@ function App() {
               </AuthGuard>
             }
           />
-          */}
         </Routes>
       </Router>
     </div>
