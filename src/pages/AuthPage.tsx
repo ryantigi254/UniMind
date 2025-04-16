@@ -15,7 +15,7 @@ const AuthPage: React.FC = () => {
   const [password, setPassword] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
   const [name, setName] = useState('');
-  const [error, setError] = useState<string | null>(null);
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isCaptchaModalOpen, setIsCaptchaModalOpen] = useState(false);
   const [isWaitingForSignupCaptcha, setIsWaitingForSignupCaptcha] = useState(false);
@@ -31,7 +31,7 @@ const AuthPage: React.FC = () => {
   const handleEmailSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isLoading) return;
-    setError(null);
+    setStatusMessage(null);
     setIsLoading(true);
 
     try {
@@ -58,7 +58,7 @@ const AuthPage: React.FC = () => {
       }
     } catch (err: any) {
       console.error('Auth error:', err);
-      setError(err.message);
+      setStatusMessage(err.message);
     } finally {
       setIsLoading(false);
     }
@@ -67,7 +67,7 @@ const AuthPage: React.FC = () => {
   const handleGoogleSignIn = async () => {
     if (isLoading) return;
     try {
-      setError(null);
+      setStatusMessage(null);
       setIsLoading(true);
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
@@ -79,25 +79,25 @@ const AuthPage: React.FC = () => {
       if (error) throw error;
     } catch (err: any) {
       console.error('Google sign-in error:', err);
-      setError('Could not sign in with Google. Please try again.');
+      setStatusMessage('Could not sign in with Google. Please try again.');
       setIsLoading(false);
     }
   };
 
   const handleAnonymousSignIn = async () => {
-    setError(null);
+    setStatusMessage(null);
     setIsCaptchaModalOpen(true);
   };
 
   const handleCaptchaVerified = async (token: string | null) => {
     if (!token) {
-      setError('CAPTCHA verification failed. Please try again.');
+      setStatusMessage('CAPTCHA verification failed. Please try again.');
       setIsLoading(false);
       return;
     }
 
     setIsLoading(true);
-    setError(null);
+    setStatusMessage(null);
 
     try {
       if (isWaitingForSignupCaptcha) {
@@ -121,16 +121,20 @@ const AuthPage: React.FC = () => {
           } else if (error.message.includes('captcha verification process failed')) {
             throw new Error('CAPTCHA verification failed on server. Please try signing up again.');
           } else {
-            throw error;
+            setStatusMessage(error.message || 'Signup failed after CAPTCHA.');
+            return;
           }
         }
 
         if (data?.user) {
-          toast.success('Signup successful! Please check your email for verification.');
+          setUser(data.user);
           setEmail('');
           setPassword('');
           setName('');
+          setIsSignUp(false);
           setIsCaptchaModalOpen(false);
+          setIsWaitingForSignupCaptcha(false);
+          navigate('/terms');
         }
 
       } else {
@@ -152,7 +156,7 @@ const AuthPage: React.FC = () => {
       }
     } catch (err: any) {
       console.error('Error during/after CAPTCHA:', err);
-      setError(err.message || 'Could not complete process after verification.');
+      setStatusMessage(err.message || 'Could not complete process after verification.');
     } finally {
       setIsLoading(false);
     }
@@ -167,9 +171,17 @@ const AuthPage: React.FC = () => {
         </div>
 
         <div className="bg-gray-800 rounded-2xl p-6 sm:p-8 shadow-xl border border-gray-700">
-          {error && (
-            <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
-              <p className="text-red-400 text-xs sm:text-sm text-center">{error}</p>
+          {statusMessage && (
+            <div className={`mb-4 sm:mb-6 p-3 sm:p-4 rounded-lg border ${ statusMessage.toLowerCase().includes('successful') 
+                ? 'bg-green-500/10 border-green-500/20' 
+                : 'bg-red-500/10 border-red-500/20' 
+            }`}>
+              <p className={`text-xs sm:text-sm text-center ${ statusMessage.toLowerCase().includes('successful') 
+                ? 'text-green-400' 
+                : 'text-red-400' 
+              }`}>
+                {statusMessage}
+              </p>
             </div>
           )}
 
@@ -313,7 +325,7 @@ const AuthPage: React.FC = () => {
             <button
               onClick={() => {
                 setIsCaptchaModalOpen(false);
-                setError(null);
+                setStatusMessage(null);
                 setIsWaitingForSignupCaptcha(false);
               }}
               className="absolute top-3 right-3 text-gray-500 hover:text-gray-300 transition-colors disabled:opacity-50"
@@ -339,12 +351,12 @@ const AuthPage: React.FC = () => {
                 onVerify={handleCaptchaVerified}
                 onError={(err) => {
                   console.error("hCaptcha error:", err);
-                  setError(`CAPTCHA error: ${err}. Please try again.`);
+                  setStatusMessage(`CAPTCHA error: ${err}. Please try again.`);
                   setIsLoading(false);
                 }}
                 onExpire={() => {
                   console.log("hCaptcha expired");
-                  setError('CAPTCHA challenge expired. Please try again.');
+                  setStatusMessage('CAPTCHA challenge expired. Please try again.');
                   setIsLoading(false);
                 }}
               />
@@ -356,9 +368,9 @@ const AuthPage: React.FC = () => {
                    <span className="ml-2 text-sm text-gray-400">Verifying...</span>
                </div>
             )}
-            {error && (
+            {statusMessage && !isLoading && (
               <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
-                <p className="text-red-400 text-xs text-center">{error}</p>
+                <p className="text-red-400 text-xs text-center">{statusMessage}</p>
               </div>
             )}
           </div>
