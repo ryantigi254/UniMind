@@ -46,9 +46,13 @@ const AuthPage: React.FC = () => {
 
         if (error) {
           if (error.message.includes('Email not confirmed')) {
-            throw new Error('Please verify your email before signing in');
+            setStatusMessage('Email not confirmed. Please check your inbox or sign up again.');
+          } else {
+            console.error('Supabase Sign In Error:', error);
+            setStatusMessage(`Login failed: ${error.message}`);
           }
-          throw new Error('Invalid login credentials');
+          setIsLoading(false);
+          return;
         }
 
         if (data.user) {
