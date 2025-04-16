@@ -17,7 +17,11 @@ import { Session, AuthChangeEvent } from '@supabase/supabase-js';
 
 function App() {
   console.log('App component rendering...');
-  const { settings, disclaimerStatus } = useStore();
+  const { settings, disclaimerStatus, setUser } = useStore((state) => ({
+    settings: state.settings,
+    disclaimerStatus: state.disclaimerStatus,
+    setUser: state.setUser,
+  }));
   const [session, setSession] = useState<Session | null>(null);
 
   useEffect(() => {
@@ -25,12 +29,14 @@ function App() {
     supabase.auth.getSession().then(({ data: { session: initialSession } }) => {
       console.log('App useEffect: getSession result:', initialSession);
       setSession(initialSession);
+      setUser(initialSession?.user ?? null);
     });
 
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (_event: AuthChangeEvent, currentSession: Session | null) => {
         console.log('App useEffect: onAuthStateChange triggered. Event:', _event, 'New session:', currentSession);
         setSession(currentSession);
+        setUser(currentSession?.user ?? null);
       }
     );
 
