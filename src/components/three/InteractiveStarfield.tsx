@@ -67,7 +67,7 @@ export const InteractiveStarfield: React.FC = () => {
   });
 
   return (
-    <Points ref={pointsRef} positions={positions as any} stride={3}>
+    <Points ref={pointsRef} positions={positions} stride={3}>
       <PointMaterial
         color="#ffffff"
         size={0.02} // Slightly larger stars
