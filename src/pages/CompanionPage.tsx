@@ -1,5 +1,5 @@
 import React, { Suspense, useState, useRef, useMemo, useEffect, memo } from 'react';
-import { Canvas, useThree, useFrame } from '@react-three/fiber';
+import { Canvas, useThree, useFrame, ThreeElements } from '@react-three/fiber';
 import { OrbitControls, Sphere, Html } from '@react-three/drei';
 import * as THREE from 'three';
 
@@ -160,10 +160,14 @@ const ControlsUpdater: React.FC<{ controlsRef: React.RefObject<any>; enabled: bo
 const CompanionPage: React.FC = () => {
   const [animationPhase, setAnimationPhase] = useState<AnimationPhase>('idle');
   const controlsRef = useRef<any>(null);
+  // Add refs for camera state used in Canvas props
+  const cameraPositionRef = useRef<THREE.Vector3>(new THREE.Vector3(0, 0, 3.5)); 
+  const cameraFovRef = useRef<number>(initialFov);
+
   const [showTermsModal, setShowTermsModal] = useState<boolean>(false);
   const [isLightSensitive, setIsLightSensitive] = useState<boolean>(false);
-  const [isMuted, setIsMuted] = useState<boolean>(false); // Added mute state
-  const [agentState, setAgentState] = useState<'listening' | 'interruptible'>('listening'); // Added agent state
+  const [isMuted, setIsMuted] = useState<boolean>(false); 
+  const [agentState, setAgentState] = useState<'listening' | 'interruptible'>('listening'); 
 
   // Check localStorage on mount
   useEffect(() => {
@@ -176,9 +180,9 @@ const CompanionPage: React.FC = () => {
     // if (sensitivity === 'true') { setIsLightSensitive(true); }
   }, []);
 
-  // Define camera positions
-  const zoomedOutPos = new THREE.Vector3(0, 0, 3.5);
-  const zoomedInPos = new THREE.Vector3(0, 0, 1.5); // Pull camera back further
+  // Define camera positions using useMemo
+  const zoomedOutPos = useMemo(() => new THREE.Vector3(0, 0, 3.5), []);
+  const zoomedInPos = useMemo(() => new THREE.Vector3(0, 0, 1.5), []);
 
   const handleAcceptTerms = () => {
     localStorage.setItem('companionTermsAccepted', 'true');
@@ -205,66 +209,64 @@ const CompanionPage: React.FC = () => {
     console.log(`Agent state toggled to: ${agentState === 'listening' ? 'interruptible' : 'listening'}`);
   };
 
+  // --- Define AnimationController Component HERE (outside the return, but inside CompanionPage scope) ---
+  // This component now *must* be rendered INSIDE <Canvas>
   const AnimationController = () => {
-    const { camera, gl } = useThree();
+    const { camera, gl } = useThree(); // Hooks are valid because it will be rendered inside Canvas
 
     useFrame((state, delta) => {
-      if (animationPhase === 'neutronStarVisible') return;
+      // Update refs used by Canvas props
+      cameraPositionRef.current.copy(camera.position);
+      if (camera instanceof THREE.PerspectiveCamera) {
+          cameraFovRef.current = camera.fov;
+      }
+      
+      // Only run animation logic if in zoomingIn phase
+      if (animationPhase !== 'zoomingIn') return; 
 
-      // Define min/max speeds for easing
+      // --- Animation Logic --- 
       const minZoomSpeed = 0.5;
       const maxZoomSpeed = 2.5;
+      const distTotal = zoomedOutPos.distanceTo(zoomedInPos);
+      const distCurrent = camera.position.distanceTo(zoomedInPos);
+      const progress = distTotal > 0.001 ? Math.max(0, Math.min(1, 1 - distCurrent / distTotal)) : 1;
+      const currentZoomSpeed = minZoomSpeed + (maxZoomSpeed - minZoomSpeed) * progress;
 
-      let progress = 0;
-      let currentZoomSpeed = minZoomSpeed;
+      camera.position.lerp(zoomedInPos, delta * currentZoomSpeed);
+      tempBgColor.copy(initialBgColor).lerp(zoomedInBgColor, progress);
+      gl.setClearColor(tempBgColor);
 
-      if (animationPhase === 'zoomingIn') {
-        const distTotal = zoomedOutPos.distanceTo(zoomedInPos);
-        const distCurrent = camera.position.distanceTo(zoomedInPos);
-        // Calculate linear progress (0 at start, 1 at end)
-        progress = distTotal > 0.001 ? Math.max(0, Math.min(1, 1 - distCurrent / distTotal)) : 1;
-        
-        // Calculate speed based on progress (starts slow, gets faster)
-        currentZoomSpeed = minZoomSpeed + (maxZoomSpeed - minZoomSpeed) * progress;
+      if (camera instanceof THREE.PerspectiveCamera) {
+        camera.fov = THREE.MathUtils.lerp(initialFov, zoomedInFov, progress);
+        camera.updateProjectionMatrix();
+      }
 
-        // Use the dynamic speed for camera lerp
-        camera.position.lerp(zoomedInPos, delta * currentZoomSpeed);
-        
-        // Keep background and FOV lerp based on linear progress for smooth visuals
-        tempBgColor.copy(initialBgColor).lerp(zoomedInBgColor, progress);
-        gl.setClearColor(tempBgColor);
-
+      if (distCurrent < 0.05) {
+        camera.position.copy(zoomedInPos);
+        gl.setClearColor(zoomedInBgColor);
         if (camera instanceof THREE.PerspectiveCamera) {
-          camera.fov = THREE.MathUtils.lerp(initialFov, zoomedInFov, progress);
-          camera.updateProjectionMatrix();
+           camera.fov = zoomedInFov; 
+           camera.updateProjectionMatrix(); 
         }
-
-        if (distCurrent < 0.05) {
-          // Snap to final state
-          camera.position.copy(zoomedInPos);
-          gl.setClearColor(zoomedInBgColor);
-          if (camera instanceof THREE.PerspectiveCamera) {
-             camera.fov = zoomedInFov; 
-             camera.updateProjectionMatrix(); 
-          }
-          setAnimationPhase('neutronStarVisible');
-          console.log("Reached zoom-in point, showing Animating Sphere.");
-          if (controlsRef.current) {
-            controlsRef.current.enabled = true;
-            controlsRef.current.target.set(0, 0, 0);
-          }
+        setAnimationPhase('neutronStarVisible');
+        console.log("Reached zoom-in point, showing Animating Sphere.");
+        if (controlsRef.current) {
+          controlsRef.current.enabled = true; 
+          controlsRef.current.target.set(0, 0, 0);
         }
       }
-    });
+      // --- End Animation Logic ---
 
-    return null;
-  };
+    }); // End useFrame
+
+    return null; // Controller doesn't render anything itself
+  }; // --- End AnimationController Definition ---
 
   // Adjust visibility logic to switch spheres
-  const showInitialSphere = animationPhase === 'idle';
+  const showInitialSphere = animationPhase === 'idle' || animationPhase === 'zoomingIn'; // Show during idle and zoom
   const showAnimatingSphere = animationPhase === 'neutronStarVisible';
-  // Enable controls in idle and final states, disable during zoom
-  const controlsEnabled = animationPhase === 'idle' || animationPhase === 'neutronStarVisible';
+  // Enable controls only when idle
+  const controlsEnabled = animationPhase === 'idle';
 
   // --- Terms Modal Component --- (Simple overlay)
   const TermsModal = () => (
@@ -339,41 +341,58 @@ const CompanionPage: React.FC = () => {
       {showTermsModal && <TermsModal />}
       
       <Canvas
-        camera={{ position: zoomedOutPos.toArray(), fov: initialFov }} 
-        style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 1 }}
-        onCreated={({ camera, gl }) => {
-          camera.lookAt(0, 0, 0);
-          gl.setClearColor(initialBgColor); 
+        className="absolute inset-0" // Use className for styling
+        camera={{
+            position: cameraPositionRef.current.toArray() as [number, number, number],
+            fov: cameraFovRef.current,
+            near: 0.1,
+            far: 1000
         }}
+        onCreated={({ gl, camera }) => {
+            gl.setClearColor(initialBgColor);
+            cameraPositionRef.current = camera.position.clone();
+            if (camera instanceof THREE.PerspectiveCamera) {
+                cameraFovRef.current = camera.fov;
+            }
+        }}
+        frameloop="always" // Keep frameloop always for smooth transitions
       >
+        {/* Render AnimationController HERE, inside Canvas */}
+        <AnimationController /> 
+
         <ambientLight intensity={0.5} />
         <pointLight position={[5, 5, 5]} intensity={1.0} />
 
         {/* Always render the starfield background */} 
-        <InteractiveStarfield />
+        <InteractiveStarfield /> 
         
-        <Suspense fallback={null}>
+        <Suspense fallback={<Html center>Loading 3D...</Html>}> 
           {/* Render the correct sphere based on phase */} 
           {showInitialSphere && <InitialIdleSphere />}
-          {showAnimatingSphere && <AnimatingSphere />}
+          {showAnimatingSphere && <AnimatingSphere />} 
         </Suspense>
 
          <OrbitControls
           ref={controlsRef}
-          enabled={controlsEnabled}
+          enabled={controlsEnabled} // Controls enabled state based on animationPhase
           target={[0, 0, 0]}
           enableDamping={true} 
           dampingFactor={0.1}
           enableZoom={false}
+          enablePan={false} // Keep pan disabled
+          enableRotate={true} // Allow rotation when idle
+          minPolarAngle={Math.PI / 4} // Restrict vertical rotation
+          maxPolarAngle={3 * Math.PI / 4}
+          minAzimuthAngle={-Math.PI / 4} // Restrict horizontal rotation
+          maxAzimuthAngle={Math.PI / 4}
         />
         
-        {/* Render AnimationController only during transition */}
-        {animationPhase === 'zoomingIn' && <AnimationController />} 
-        <ControlsUpdater controlsRef={controlsRef} enabled={controlsEnabled} />
+        {/* ControlsUpdater doesn't need enabled prop if OrbitControls handles it */}
+        <ControlsUpdater controlsRef={controlsRef} enabled={controlsEnabled} /> 
       </Canvas>
 
       {/* Render Button Outside Canvas for Fixed Positioning */} 
-      {showInitialSphere && (
+      {(animationPhase === 'idle') && ( 
         <div style={{
           position: 'absolute',
           top: '50%',
@@ -410,8 +429,7 @@ const CompanionPage: React.FC = () => {
         </div>
       )}
 
-      {/* ADDED: Render Animating Sphere Buttons Outside Canvas */} 
-      {showAnimatingSphere && (
+      {(animationPhase === 'neutronStarVisible') && (
         <div style={{
             position: 'absolute',
             top: '50%',
