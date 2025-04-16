@@ -63,12 +63,6 @@ const MainHeader: React.FC = () => {
               </svg>
             </div>
           )}
-          <button
-            onClick={handleLogoClick}
-            className="text-3xl font-bold text-primary-500 hover:text-primary-400 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-gray-900 rounded-lg px-2"
-          >
-            UniMind
-          </button>
         </div>
       </div>
       
