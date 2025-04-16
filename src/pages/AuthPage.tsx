@@ -18,13 +18,15 @@ const AuthPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isCaptchaModalOpen, setIsCaptchaModalOpen] = useState(false);
-  const [userPendingCaptcha, setUserPendingCaptcha] = useState<User | null>(null);
+  const [isWaitingForSignupCaptcha, setIsWaitingForSignupCaptcha] = useState(false);
 
   useEffect(() => {
-    if (user && !userPendingCaptcha) {
-      navigate('/');
+    if (user) {
+      if (!isCaptchaModalOpen) {
+        navigate('/');
+      }
     }
-  }, [user, userPendingCaptcha, navigate]);
+  }, [user, isCaptchaModalOpen, navigate]);
 
   const handleEmailSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,30 +36,8 @@ const AuthPage: React.FC = () => {
 
     try {
       if (isSignUp) {
-        const { data, error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            data: { 
-              full_name: name,
-              needs_post_verification_captcha: true 
-            },
-          }
-        });
-
-        if (error) {
-          if (error.message.includes('already registered')) {
-            throw new Error('Email already registered');
-          }
-          throw error;
-        }
-
-        if (data?.user) {
-          toast.success('Please check your email for verification instructions');
-          setEmail('');
-          setPassword('');
-          setName('');
-        }
+        setIsWaitingForSignupCaptcha(true);
+        setIsCaptchaModalOpen(true);
       } else {
         const { data, error } = await supabase.auth.signInWithPassword({
           email,
@@ -72,13 +52,8 @@ const AuthPage: React.FC = () => {
         }
 
         if (data.user) {
-          if (data.user.user_metadata?.needs_post_verification_captcha) {
-            setUserPendingCaptcha(data.user);
-            setIsCaptchaModalOpen(true);
-          } else {
-            setUser(data.user);
-            navigate('/terms');
-          }
+          setUser(data.user);
+          navigate('/terms');
         }
       }
     } catch (err: any) {
@@ -111,7 +86,6 @@ const AuthPage: React.FC = () => {
 
   const handleAnonymousSignIn = async () => {
     setError(null);
-    setUserPendingCaptcha(null);
     setIsCaptchaModalOpen(true);
   };
 
@@ -126,21 +100,39 @@ const AuthPage: React.FC = () => {
     setError(null);
 
     try {
-      if (userPendingCaptcha) {
-        console.log("[handleCaptchaVerified] Post-Sign-In CAPTCHA verified for user:", userPendingCaptcha.id);
-        const { error: updateError } = await supabase.auth.updateUser({
-          data: { needs_post_verification_captcha: false }
+      if (isWaitingForSignupCaptcha) {
+        console.log("[handleCaptchaVerified] Pre-Signup CAPTCHA token received.");
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            captchaToken: token,
+            data: { 
+              full_name: name,
+            },
+          }
         });
 
-        if (updateError) {
-          console.error('Error updating user metadata:', updateError);
-          setError(updateError.message || 'Failed to update user status after CAPTCHA.');
+        setIsWaitingForSignupCaptcha(false);
+
+        if (error) {
+          if (error.message.includes('already registered')) {
+            throw new Error('Email already registered');
+          } else if (error.message.includes('captcha verification process failed')) {
+            throw new Error('CAPTCHA verification failed on server. Please try signing up again.');
+          } else {
+            throw error;
+          }
         }
 
-        setUser(userPendingCaptcha);
-        setUserPendingCaptcha(null);
-        setIsCaptchaModalOpen(false);
-        navigate('/terms');
+        if (data?.user) {
+          toast.success('Signup successful! Please check your email for verification.');
+          setEmail('');
+          setPassword('');
+          setName('');
+          setIsCaptchaModalOpen(false);
+        }
+
       } else {
         console.log("[handleCaptchaVerified] Anonymous Sign-In CAPTCHA token:", token);
         const { data, error } = await supabase.auth.signInAnonymously({
@@ -154,6 +146,7 @@ const AuthPage: React.FC = () => {
         if (data.user) {
           setUser(data.user);
           setIsCaptchaModalOpen(false);
+          setIsWaitingForSignupCaptcha(false);
           navigate('/terms');
         }
       }
@@ -321,7 +314,7 @@ const AuthPage: React.FC = () => {
               onClick={() => {
                 setIsCaptchaModalOpen(false);
                 setError(null);
-                setUserPendingCaptcha(null);
+                setIsWaitingForSignupCaptcha(false);
               }}
               className="absolute top-3 right-3 text-gray-500 hover:text-gray-300 transition-colors disabled:opacity-50"
               aria-label="Close CAPTCHA modal"
@@ -331,17 +324,17 @@ const AuthPage: React.FC = () => {
             </button>
 
             <h2 className="text-lg sm:text-xl font-semibold text-white mb-4 text-center">
-              {userPendingCaptcha ? 'Verify Your Account' : 'Quick Security Check'}
+              {isWaitingForSignupCaptcha ? 'Verify Signup' : 'Quick Security Check'}
             </h2>
             <p className="text-gray-400 text-sm mb-6 text-center">
-              {userPendingCaptcha
-                ? 'Please complete the challenge below to finish signing in.'
+              {isWaitingForSignupCaptcha
+                ? 'Please complete the challenge below to finish signing up.'
                 : 'Please complete the challenge below to continue.'}
             </p>
 
             <div className="flex justify-center mb-4">
               <HCaptcha
-                key={userPendingCaptcha ? userPendingCaptcha.id : 'anonymous'}
+                key={isWaitingForSignupCaptcha ? 'signup' : 'anonymous'}
                 sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY || ''}
                 onVerify={handleCaptchaVerified}
                 onError={(err) => {
