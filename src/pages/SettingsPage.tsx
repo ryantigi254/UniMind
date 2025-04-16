@@ -25,6 +25,31 @@ import {
 } from '@tabler/icons-react';
 import { isValidPhoneNumber } from 'libphonenumber-js';
 
+// Define reusable styles
+const inputStyles = {
+  inputWrapper: [
+    "h-12", "bg-gray-700", "border", "border-gray-600", "rounded-xl", "text-white",
+    "group-data-[focus=true]:border-primary-500",
+    "group-data-[focus=true]:ring-2",
+    "group-data-[focus=true]:ring-primary-500/50",
+    "transition-colors", "outline-none"
+  ],
+  input: "text-white relative z-0",
+  label: "text-gray-300 font-medium"
+};
+
+const textAreaStyles = {
+  inputWrapper: [
+    "bg-gray-700", "border", "border-gray-600", "rounded-xl", "text-white",
+    "group-data-[focus=true]:border-primary-500",
+    "group-data-[focus=true]:ring-2",
+    "group-data-[focus=true]:ring-primary-500/50",
+    "transition-colors", "outline-none"
+  ],
+  input: "text-white relative z-0",
+  label: "text-gray-300 font-medium"
+};
+
 interface ConfirmModalProps {
   isOpen: boolean;
   onClose: () => void;
