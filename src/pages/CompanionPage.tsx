@@ -5,6 +5,8 @@ import { useStore } from '../store'; // Keep if needed for modal logic
 type AnimationPhase = 'idle' | 'zoomingIn' | 'neutronStarVisible';
 
 const CompanionPage: React.FC = () => {
+  console.log('CompanionPage component function started.');
+
   // Keep state related to basic functionality like the modal
   const [showTermsModal, setShowTermsModal] = useState<boolean>(false);
   const [isLightSensitive, setIsLightSensitive] = useState<boolean>(false);
