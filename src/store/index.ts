@@ -1,10 +1,11 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
 import { Chat, Message, MoodEntry, JournalEntry, UserSettings, DisclaimerStatus } from '../types';
-import { User } from '@supabase/supabase-js';
+import { User, Session } from '@supabase/supabase-js';
 
 interface State {
   user: User | null;
+  session: Session | null;
   chats: Chat[];
   currentChat: Chat | null;
   moodEntries: MoodEntry[];
@@ -19,6 +20,7 @@ interface State {
 
 interface Actions {
   setUser: (user: User | null) => void;
+  setSession: (session: Session | null) => void;
   setCurrentChat: (chat: Chat | null) => void;
   addChat: (chat: Chat) => void;
   renameChat: (chatId: string, newTitle: string) => void;
@@ -46,8 +48,9 @@ const initialSettings: UserSettings = {
 
 export const useStore = create<State & Actions>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       user: null,
+      session: null,
       chats: [],
       currentChat: null,
       moodEntries: [],
@@ -60,6 +63,7 @@ export const useStore = create<State & Actions>()(
       error: null,
 
       setUser: (user) => set({ user }),
+      setSession: (session) => set({ session }),
       
       setCurrentChat: (chat) => set({ currentChat: chat }),
       
@@ -153,11 +157,13 @@ export const useStore = create<State & Actions>()(
     }),
     {
       name: 'unimind-storage',
+      storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         settings: state.settings,
         disclaimerStatus: state.disclaimerStatus,
         isSidebarCollapsed: state.isSidebarCollapsed,
         chats: state.chats,
+        isSidebarOpen: state.isSidebarOpen,
       }),
     }
   )

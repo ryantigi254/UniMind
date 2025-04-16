@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
 import AuthGuard from './components/AuthGuard';
@@ -17,12 +17,11 @@ import { Session, AuthChangeEvent } from '@supabase/supabase-js';
 
 function App() {
   console.log('App component rendering...');
-  const { settings, disclaimerStatus, setUser } = useStore((state) => ({
+  const { settings, setSession, setUser } = useStore((state) => ({
     settings: state.settings,
-    disclaimerStatus: state.disclaimerStatus,
+    setSession: state.setSession,
     setUser: state.setUser,
   }));
-  const [session, setSession] = useState<Session | null>(null);
 
   useEffect(() => {
     console.log('App useEffect: Initial check for session...');
@@ -44,14 +43,14 @@ function App() {
       console.log('App useEffect: Cleaning up auth listener.');
       authListener?.subscription?.unsubscribe();
     };
-  }, []);
+  }, [setSession, setUser]);
 
   const isDark =
     settings.theme === 'dark' ||
     (settings.theme === 'system' &&
       window.matchMedia('(prefers-color-scheme: dark)').matches);
 
-  console.log('App component: Calculated isDark:', isDark, 'Session state:', session);
+  console.log('App component: Calculated isDark:', isDark);
 
   return (
     <div className={isDark ? 'dark' : ''}>
@@ -63,31 +62,22 @@ function App() {
           <Route
             path="/*"
             element={
-              session ? (
-                !disclaimerStatus.accepted ? (
-                  <DisclaimerModal />
-                ) : (
-                  <Layout>
-                    <Routes>
-                      <Route path="/" element={<ChatPage />} />
-                      <Route path="/mood" element={<MoodTrackerPage />} />
-                      <Route path="/journal" element={<JournalPage />} />
-                      <Route path="/settings" element={<SettingsPage />} />
-                      <Route path="/info" element={<InfoPage />} />
-                      <Route 
-                        path="/companion" 
-                        element={(() => {
-                          console.log('Rendering /companion route element...');
-                          return <CompanionPage />;
-                        })()}
-                      />
-                      <Route path="*" element={<Navigate to="/" replace />} />
-                    </Routes>
-                  </Layout>
-                )
-              ) : (
-                session === null ? <Navigate to="/auth" replace /> : <div>Loading Session...</div>
-              )
+              <AuthGuard>
+                <Layout>
+                  <Routes>
+                    <Route path="/" element={<ChatPage />} />
+                    <Route path="/mood" element={<MoodTrackerPage />} />
+                    <Route path="/journal" element={<JournalPage />} />
+                    <Route path="/settings" element={<SettingsPage />} />
+                    <Route path="/info" element={<InfoPage />} />
+                    <Route 
+                      path="/companion" 
+                      element={<CompanionPage />}
+                    />
+                    <Route path="*" element={<Navigate to="/" replace />} />
+                  </Routes>
+                </Layout>
+              </AuthGuard>
             }
           />
         </Routes>
