@@ -50,7 +50,6 @@ const NavItem: React.FC<NavItemProps> = ({
     href={path}
     onClick={(e) => {
       e.preventDefault();
-      console.log(`NavItem clicked: Attempting to navigate to ${path}`);
       onClick?.();
     }}
     className={`
