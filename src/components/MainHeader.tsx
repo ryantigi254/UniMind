@@ -1,11 +1,9 @@
 import React from 'react';
 import { Menu, User, AlertTriangle } from 'lucide-react';
-import { useNavigate, useLocation } from 'react-router-dom';
 import { useStore } from '../store';
+import UniMindTextLogo from './UniMindTextLogo';
 
 const MainHeader: React.FC = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
   const { isSidebarCollapsed, toggleSidebarCollapse, toggleSidebar } = useStore();
 
   const handleToggle = () => {
@@ -13,22 +11,6 @@ const MainHeader: React.FC = () => {
       toggleSidebarCollapse();
     } else {
       toggleSidebar();
-    }
-  };
-
-  const handleAccountClick = () => {
-    if (location.pathname === '/settings') {
-      navigate('/');
-    } else {
-      navigate('/settings');
-    }
-  };
-
-  const handleLogoClick = () => {
-    if (isSidebarCollapsed) {
-      window.location.reload();
-    } else {
-      navigate('/');
     }
   };
 
@@ -44,26 +26,7 @@ const MainHeader: React.FC = () => {
         >
           <Menu className="h-5 w-5" />
         </button>
-        <div className="flex items-center gap-2">
-          {!isSidebarCollapsed && (
-            <div className="w-10 h-10 rounded-lg bg-primary-500 flex items-center justify-center">
-              <svg
-                width="28"
-                height="28"
-                viewBox="0 0 100 100"
-                className="text-white"
-                aria-hidden="true"
-              >
-                <rect width="60" height="45" x="20" y="35" rx="10" ry="10" fill="currentColor"/>
-                <circle cx="38" cy="53" r="5" fill="#1F2937" />
-                <circle cx="62" cy="53" r="5" fill="#1F2937" />
-                <path d="M45 62 Q50 67 55 62" stroke="#1F2937" strokeWidth="3" fill="none" strokeLinecap="round"/>
-                <line x1="50" y1="25" x2="50" y2="35" stroke="currentColor" strokeWidth="3"/>
-                <circle cx="50" cy="22" r="3" fill="currentColor"/>
-              </svg>
-            </div>
-          )}
-        </div>
+        {isSidebarCollapsed && <UniMindTextLogo />}
       </div>
       
       <div className="flex items-center gap-3">
@@ -77,7 +40,7 @@ const MainHeader: React.FC = () => {
         </button>
         
         <button
-          onClick={handleAccountClick}
+          onClick={() => window.location.href = '/settings'}
           className="p-2 text-white hover:bg-gray-800 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-gray-900"
           aria-label="Account Settings"
         >

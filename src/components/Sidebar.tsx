@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useStore } from '../store';
 import { Chat } from '../types';
 import ContextMenu from './ContextMenu';
+import UniMindTextLogo from './UniMindTextLogo';
 
 interface NavItemProps {
   icon: React.ReactNode;
@@ -149,12 +150,7 @@ const Sidebar: React.FC = () => {
       {/* Header Section */}
       <div className="px-4 py-6 flex items-center justify-between">
         {!isSidebarCollapsed && (
-          <button
-            onClick={() => navigate('/')}
-            className="text-3xl font-bold text-primary-500 hover:text-primary-400 transition-colors"
-          >
-            UniMind
-          </button>
+          <UniMindTextLogo />
         )}
         <button
           onClick={toggleSidebarCollapse}
