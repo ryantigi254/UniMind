@@ -2,6 +2,7 @@ import React, { Suspense, useState, useRef, useMemo, useEffect, memo } from 'rea
 import { Canvas, useThree, useFrame, ThreeElements } from '@react-three/fiber';
 import { OrbitControls, Sphere, Html } from '@react-three/drei';
 import * as THREE from 'three';
+import { useStore } from '../store'; // Import Zustand store
 
 // Import necessary components
 // import { GalaxySphere } from '../components/three/GalaxySphere'; // REMOVE old import
@@ -156,6 +157,70 @@ const ControlsUpdater: React.FC<{ controlsRef: React.RefObject<any>; enabled: bo
   return null;
 };
 
+// --- Standalone AnimationController Component ---
+// Moved outside CompanionPage
+// Define props for AnimationController
+type AnimationControllerProps = {
+  animationPhase: AnimationPhase;
+  setAnimationPhase: React.Dispatch<React.SetStateAction<AnimationPhase>>;
+  zoomedOutPos: THREE.Vector3;
+  zoomedInPos: THREE.Vector3;
+  cameraPositionRef: React.MutableRefObject<THREE.Vector3>;
+  cameraFovRef: React.MutableRefObject<number>;
+};
+
+const AnimationController: React.FC<AnimationControllerProps> = ({
+  animationPhase,
+  setAnimationPhase,
+  zoomedOutPos,
+  zoomedInPos,
+  cameraPositionRef,
+  cameraFovRef
+}) => {
+  const { camera, gl } = useThree(); // Hooks are valid because it's rendered inside Canvas
+
+  useFrame((state, delta) => {
+    // Update refs used by Canvas props
+    cameraPositionRef.current.copy(camera.position);
+    if (camera instanceof THREE.PerspectiveCamera) {
+      cameraFovRef.current = camera.fov;
+    }
+
+    // Only run animation logic if in zoomingIn phase
+    if (animationPhase !== 'zoomingIn') return;
+
+    // --- Animation Logic ---
+    const minZoomSpeed = 0.5;
+    const maxZoomSpeed = 2.5;
+    const distTotal = zoomedOutPos.distanceTo(zoomedInPos);
+    const distCurrent = camera.position.distanceTo(zoomedInPos);
+    const progress = distTotal > 0.001 ? Math.max(0, Math.min(1, 1 - distCurrent / distTotal)) : 1;
+    const currentZoomSpeed = minZoomSpeed + (maxZoomSpeed - minZoomSpeed) * progress;
+
+    camera.position.lerp(zoomedInPos, delta * currentZoomSpeed);
+    tempBgColor.copy(initialBgColor).lerp(zoomedInBgColor, progress);
+    gl.setClearColor(tempBgColor);
+
+    if (camera instanceof THREE.PerspectiveCamera) {
+      camera.fov = THREE.MathUtils.lerp(initialFov, zoomedInFov, progress);
+      camera.updateProjectionMatrix();
+    }
+
+    if (distCurrent < 0.05) {
+      camera.position.copy(zoomedInPos);
+      gl.setClearColor(zoomedInBgColor);
+      if (camera instanceof THREE.PerspectiveCamera) {
+         camera.fov = zoomedInFov;
+         camera.updateProjectionMatrix();
+      }
+      console.log("Zoom sequence complete, setting phase to neutronStarVisible");
+      setAnimationPhase('neutronStarVisible'); // Update phase when zoom completes
+    }
+  });
+
+  return null; // This component doesn't render anything itself
+};
+
 // --- Main Companion Page Component --- 
 const CompanionPage: React.FC = () => {
   const [animationPhase, setAnimationPhase] = useState<AnimationPhase>('idle');
@@ -168,6 +233,8 @@ const CompanionPage: React.FC = () => {
   const [isLightSensitive, setIsLightSensitive] = useState<boolean>(false);
   const [isMuted, setIsMuted] = useState<boolean>(false); 
   const [agentState, setAgentState] = useState<'listening' | 'interruptible'>('listening'); 
+
+  const { accepted: disclaimerAccepted } = useStore((state) => state.disclaimerStatus); // Get disclaimer status from store
 
   // Check localStorage on mount
   useEffect(() => {
@@ -208,59 +275,6 @@ const CompanionPage: React.FC = () => {
     setAgentState(currentState => currentState === 'listening' ? 'interruptible' : 'listening');
     console.log(`Agent state toggled to: ${agentState === 'listening' ? 'interruptible' : 'listening'}`);
   };
-
-  // --- Define AnimationController Component HERE (outside the return, but inside CompanionPage scope) ---
-  // This component now *must* be rendered INSIDE <Canvas>
-  const AnimationController = () => {
-    const { camera, gl } = useThree(); // Hooks are valid because it will be rendered inside Canvas
-
-    useFrame((state, delta) => {
-      // Update refs used by Canvas props
-      cameraPositionRef.current.copy(camera.position);
-      if (camera instanceof THREE.PerspectiveCamera) {
-          cameraFovRef.current = camera.fov;
-      }
-      
-      // Only run animation logic if in zoomingIn phase
-      if (animationPhase !== 'zoomingIn') return; 
-
-      // --- Animation Logic --- 
-      const minZoomSpeed = 0.5;
-      const maxZoomSpeed = 2.5;
-      const distTotal = zoomedOutPos.distanceTo(zoomedInPos);
-      const distCurrent = camera.position.distanceTo(zoomedInPos);
-      const progress = distTotal > 0.001 ? Math.max(0, Math.min(1, 1 - distCurrent / distTotal)) : 1;
-      const currentZoomSpeed = minZoomSpeed + (maxZoomSpeed - minZoomSpeed) * progress;
-
-      camera.position.lerp(zoomedInPos, delta * currentZoomSpeed);
-      tempBgColor.copy(initialBgColor).lerp(zoomedInBgColor, progress);
-      gl.setClearColor(tempBgColor);
-
-      if (camera instanceof THREE.PerspectiveCamera) {
-        camera.fov = THREE.MathUtils.lerp(initialFov, zoomedInFov, progress);
-        camera.updateProjectionMatrix();
-      }
-
-      if (distCurrent < 0.05) {
-        camera.position.copy(zoomedInPos);
-        gl.setClearColor(zoomedInBgColor);
-        if (camera instanceof THREE.PerspectiveCamera) {
-           camera.fov = zoomedInFov; 
-           camera.updateProjectionMatrix(); 
-        }
-        setAnimationPhase('neutronStarVisible');
-        console.log("Reached zoom-in point, showing Animating Sphere.");
-        if (controlsRef.current) {
-          controlsRef.current.enabled = true; 
-          controlsRef.current.target.set(0, 0, 0);
-        }
-      }
-      // --- End Animation Logic ---
-
-    }); // End useFrame
-
-    return null; // Controller doesn't render anything itself
-  }; // --- End AnimationController Definition ---
 
   // Adjust visibility logic to switch spheres
   const showInitialSphere = animationPhase === 'idle' || animationPhase === 'zoomingIn'; // Show during idle and zoom
@@ -357,8 +371,15 @@ const CompanionPage: React.FC = () => {
         }}
         frameloop="always" // Keep frameloop always for smooth transitions
       >
-        {/* Render AnimationController HERE, inside Canvas */}
-        <AnimationController /> 
+        {/* Pass props to the standalone AnimationController */}
+        <AnimationController
+          animationPhase={animationPhase}
+          setAnimationPhase={setAnimationPhase}
+          zoomedOutPos={zoomedOutPos}
+          zoomedInPos={zoomedInPos}
+          cameraPositionRef={cameraPositionRef}
+          cameraFovRef={cameraFovRef}
+        />
 
         <ambientLight intensity={0.5} />
         <pointLight position={[5, 5, 5]} intensity={1.0} />
