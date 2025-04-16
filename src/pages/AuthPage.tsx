@@ -14,6 +14,7 @@ const AuthPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
+  const [name, setName] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isCaptchaModalOpen, setIsCaptchaModalOpen] = useState(false);
@@ -37,7 +38,10 @@ const AuthPage: React.FC = () => {
           email,
           password,
           options: {
-            data: { needs_post_verification_captcha: true },
+            data: { 
+              full_name: name,
+              needs_post_verification_captcha: true 
+            },
           }
         });
 
@@ -52,6 +56,7 @@ const AuthPage: React.FC = () => {
           toast.success('Please check your email for verification instructions');
           setEmail('');
           setPassword('');
+          setName('');
         }
       } else {
         const { data, error } = await supabase.auth.signInWithPassword({
@@ -200,6 +205,25 @@ const AuthPage: React.FC = () => {
           </div>
 
           <form onSubmit={handleEmailSignIn} className="space-y-4 sm:space-y-5">
+            {isSignUp && (
+              <div className="space-y-1">
+                <label htmlFor="name" className="block text-xs sm:text-sm font-medium text-gray-300">
+                  Full Name
+                </label>
+                <div className="relative">
+                  <input
+                    id="name"
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="w-full h-11 sm:h-12 pl-4 sm:pl-5 pr-4 bg-gray-700 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors text-sm sm:text-base"
+                    placeholder="Enter your full name"
+                    required
+                    aria-label="Full Name"
+                  />
+                </div>
+              </div>
+            )}
             <div className="space-y-1">
               <label htmlFor="email" className="block text-xs sm:text-sm font-medium text-gray-300">
                 Email address
