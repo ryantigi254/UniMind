@@ -121,7 +121,8 @@ const AuthPage: React.FC = () => {
           setIsSignUp(false);
           setIsCaptchaModalOpen(false);
           setIsWaitingForSignupCaptcha(false);
-          navigate('/terms');
+          navigate('/auth');
+          setStatusMessage('Signup successful! Please sign in.');
         }
 
       } else if (isWaitingForLoginCaptcha) {

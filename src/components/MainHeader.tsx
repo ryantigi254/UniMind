@@ -2,9 +2,11 @@ import React from 'react';
 import { Menu, User, AlertTriangle } from 'lucide-react';
 import { useStore } from '../store';
 import UniMindTextLogo from './UniMindTextLogo';
+import { useNavigate } from 'react-router-dom';
 
 const MainHeader: React.FC = () => {
   const { isSidebarCollapsed, toggleSidebarCollapse, toggleSidebar } = useStore();
+  const navigate = useNavigate();
 
   const handleToggle = () => {
     if (window.innerWidth >= 768) {
@@ -40,7 +42,7 @@ const MainHeader: React.FC = () => {
         </button>
         
         <button
-          onClick={() => window.location.href = '/settings'}
+          onClick={() => navigate('/settings')}
           className="p-2 text-white hover:bg-gray-800 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-gray-900"
           aria-label="Account Settings"
         >
