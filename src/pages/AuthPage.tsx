@@ -19,6 +19,7 @@ const AuthPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isCaptchaModalOpen, setIsCaptchaModalOpen] = useState(false);
   const [isWaitingForSignupCaptcha, setIsWaitingForSignupCaptcha] = useState(false);
+  const [isWaitingForLoginCaptcha, setIsWaitingForLoginCaptcha] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -39,26 +40,8 @@ const AuthPage: React.FC = () => {
         setIsWaitingForSignupCaptcha(true);
         setIsCaptchaModalOpen(true);
       } else {
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email,
-          password
-        });
-
-        if (error) {
-          if (error.message.includes('Email not confirmed')) {
-            setStatusMessage('Email not confirmed. Please check your inbox or sign up again.');
-          } else {
-            console.error('Supabase Sign In Error:', error);
-            setStatusMessage(`Login failed: ${error.message}`);
-          }
-          setIsLoading(false);
-          return;
-        }
-
-        if (data.user) {
-          setUser(data.user);
-          navigate('/terms');
-        }
+        setIsWaitingForLoginCaptcha(true);
+        setIsCaptchaModalOpen(true);
       }
     } catch (err: any) {
       console.error('Auth error:', err);
@@ -141,6 +124,35 @@ const AuthPage: React.FC = () => {
           navigate('/terms');
         }
 
+      } else if (isWaitingForLoginCaptcha) {
+        console.log("[handleCaptchaVerified] Login CAPTCHA token received:", token);
+        try {
+          const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+            options: {
+              captchaToken: token,
+            },
+          });
+
+          setIsWaitingForLoginCaptcha(false);
+
+          if (error) {
+            console.error('Supabase Sign In Error:', error);
+            setStatusMessage(`Login failed: ${error.message}`);
+          } else if (data.user) {
+            setUser(data.user);
+            setIsCaptchaModalOpen(false);
+            navigate('/terms');
+          } else {
+            setStatusMessage('Login process did not return a user. Please try again.');
+          }
+        } catch (loginErr: any) {
+          console.error("Error during login after CAPTCHA:", loginErr);
+          setStatusMessage(loginErr.message || 'An unexpected error occurred during login.');
+          setIsWaitingForLoginCaptcha(false);
+        }
+
       } else {
         console.log("[handleCaptchaVerified] Anonymous Sign-In CAPTCHA token:", token);
         const { data, error } = await supabase.auth.signInAnonymously({
@@ -155,6 +167,7 @@ const AuthPage: React.FC = () => {
           setUser(data.user);
           setIsCaptchaModalOpen(false);
           setIsWaitingForSignupCaptcha(false);
+          setIsWaitingForLoginCaptcha(false);
           navigate('/terms');
         }
       }
@@ -331,6 +344,7 @@ const AuthPage: React.FC = () => {
                 setIsCaptchaModalOpen(false);
                 setStatusMessage(null);
                 setIsWaitingForSignupCaptcha(false);
+                setIsWaitingForLoginCaptcha(false);
               }}
               className="absolute top-3 right-3 text-gray-500 hover:text-gray-300 transition-colors disabled:opacity-50"
               aria-label="Close CAPTCHA modal"
@@ -340,17 +354,21 @@ const AuthPage: React.FC = () => {
             </button>
 
             <h2 className="text-lg sm:text-xl font-semibold text-white mb-4 text-center">
-              {isWaitingForSignupCaptcha ? 'Verify Signup' : 'Quick Security Check'}
+              {isWaitingForSignupCaptcha ? 'Verify Signup' : 
+               isWaitingForLoginCaptcha ? 'Verify Login' : 
+               'Quick Security Check'}
             </h2>
             <p className="text-gray-400 text-sm mb-6 text-center">
               {isWaitingForSignupCaptcha
                 ? 'Please complete the challenge below to finish signing up.'
+                : isWaitingForLoginCaptcha 
+                ? 'Please complete the challenge below to sign in.'
                 : 'Please complete the challenge below to continue.'}
             </p>
 
             <div className="flex justify-center mb-4">
               <HCaptcha
-                key={isWaitingForSignupCaptcha ? 'signup' : 'anonymous'}
+                key={isWaitingForSignupCaptcha ? 'signup' : isWaitingForLoginCaptcha ? 'login' : 'anonymous'}
                 sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY || ''}
                 onVerify={handleCaptchaVerified}
                 onError={(err) => {
