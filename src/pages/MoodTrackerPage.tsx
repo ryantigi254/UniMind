@@ -181,12 +181,24 @@ const MoodTrackerPage: React.FC = () => {
     }
 
     try {
-      const { error } = await supabase.from('mood_entries').delete().neq('id', 'none');
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated for reset');
+
+      const { error } = await supabase
+        .from('mood_entries')
+        .delete()
+        .eq('user_id', user.id);
+
       if (error) throw error;
-      await fetchMoodEntries();
-    } catch (err) {
+
+      setMoodEntries([]);
+      setError(null);
+      calculateStreaks();
+      checkTodayEntry();
+
+    } catch (err: any) {
       console.error('Error resetting mood entries:', err);
-      setError('Failed to reset mood entries');
+      setError(`Failed to reset mood entries: ${err.message}`);
     }
   };
 
