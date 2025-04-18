@@ -86,6 +86,10 @@ const MoodTrackerPage: React.FC = () => {
     if (moodEntries.length > 0) {
       calculateStreaks();
       checkTodayEntry();
+    } else {
+      setCurrentStreak(0);
+      setLongestStreak(0);
+      setAlreadyLoggedToday(false);
     }
   }, [moodEntries]);
 
@@ -193,9 +197,6 @@ const MoodTrackerPage: React.FC = () => {
 
       setMoodEntries([]);
       setError(null);
-      calculateStreaks();
-      checkTodayEntry();
-
     } catch (err: any) {
       console.error('Error resetting mood entries:', err);
       setError(`Failed to reset mood entries: ${err.message}`);
