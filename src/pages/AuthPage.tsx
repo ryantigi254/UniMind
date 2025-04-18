@@ -10,7 +10,7 @@ import { Link } from 'react-router-dom';
 
 const AuthPage: React.FC = () => {
   const navigate = useNavigate();
-  const { user, setUser } = useStore();
+  const { user, setUser, disclaimerStatus, setDisclaimerAccepted } = useStore();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
@@ -58,9 +58,6 @@ const AuthPage: React.FC = () => {
       setIsLoading(true);
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/terms`
-        }
       });
 
       if (error) throw error;
@@ -121,8 +118,12 @@ const AuthPage: React.FC = () => {
           setIsSignUp(false);
           setIsCaptchaModalOpen(false);
           setIsWaitingForSignupCaptcha(false);
-          navigate('/auth');
           setStatusMessage('Signup successful! Please sign in.');
+          if (disclaimerStatus.accepted) {
+            navigate('/');
+          } else {
+            navigate('/terms');
+          }
         }
 
       } else if (isWaitingForLoginCaptcha) {
@@ -144,7 +145,11 @@ const AuthPage: React.FC = () => {
           } else if (data.user) {
             setUser(data.user);
             setIsCaptchaModalOpen(false);
-            navigate('/terms');
+            if (disclaimerStatus.accepted) {
+              navigate('/');
+            } else {
+              navigate('/terms');
+            }
           } else {
             setStatusMessage('Login process did not return a user. Please try again.');
           }
@@ -169,7 +174,11 @@ const AuthPage: React.FC = () => {
           setIsCaptchaModalOpen(false);
           setIsWaitingForSignupCaptcha(false);
           setIsWaitingForLoginCaptcha(false);
-          navigate('/terms');
+          if (disclaimerStatus.accepted) {
+            navigate('/');
+          } else {
+            navigate('/terms');
+          }
         }
       }
     } catch (err: any) {
