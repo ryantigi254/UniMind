@@ -1,0 +1,392 @@
+\documentclass[11pt]{article} % Slightly larger font size
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{times} % Use Times font
+\usepackage{parskip} % Add space between paragraphs
+\usepackage{enumitem} % For customizing lists
+\usepackage{minted} % For code highlighting (requires Python pygments)
+% \usepackage{inconsolata} % Optional: Use Inconsolata for code
+
+\geometry{a4paper, margin=1in}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    pdftitle={AI Collaboration Report - UniMind Project Debugging},
+    pdfpagemode=FullScreen,
+}
+
+\title{Detailed Report on AI Assistant Collaboration\\ during UniMind Project Debugging Phase}
+\author{Project Team (UniMind) and AI Assistant (Gemini)}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\newpage
+
+\begin{abstract}
+This document provides a comprehensive account of the collaborative debugging process undertaken for the UniMind web application, detailing the interactions between the project developer(s) and an AI programming assistant (Gemini). The primary objective was to resolve critical issues encountered during the deployment and testing phases on the Netlify platform, encompassing build failures, routing errors, session management inconsistencies, and authentication flow complexities within the React/Vite/Supabase technology stack. The AI assistant acted as an interactive pair programmer, assisting in diagnostics through log analysis and code inspection, formulating and executing solutions via code modification and dependency management, and performing necessary Git operations under direct user supervision and approval. This report serves as a transparent record of the AI's involvement, its specific contributions, and the collaborative decision-making process, aiming to satisfy ethical AI usage standards within an academic context.
+\end{abstract}
+
+\section{Introduction}
+The UniMind project is a web-based mental wellness companion developed using a modern frontend stack: React, TypeScript, Vite, Zustand for state management, React Router for navigation, and Supabase for backend services including authentication and database persistence. During the transition from development to deployment on Netlify, several significant operational issues emerged that hindered user access and functionality.
+
+These issues included:
+\begin{itemize}
+    \item Incorrect resource requests pointing to development servers (\texttt{localhost}).
+    \item Build failures within the Netlify CI/CD environment related to dependency resolution.
+    \item Runtime errors leading to blank pages or unexpected navigation behaviour (404 errors).
+    \item Complex state management and authentication flow problems, particularly concerning session persistence, user state synchronisation, and conditional navigation logic (e.g., terms acceptance).
+\end{itemize}
+
+To address these multifaceted challenges efficiently, an AI programming assistant was employed as a collaborative tool. The assistant utilised its capabilities for codebase analysis (file reading, semantic search, grep), code generation and modification, dependency inspection (\texttt{package.json}), and execution of terminal commands (primarily Git operations) based on interactive dialogue and specific user instructions. This document meticulously details the problems encountered, the diagnostic steps taken (often involving AI analysis), the solutions proposed and implemented (often by the AI with user confirmation), and the outcomes observed.
+
+\section{Debugging Process and AI Collaboration Details}
+
+The debugging journey involved several distinct phases, often overlapping as fixing one issue revealed another.
+
+\subsection{Initial Diagnostics: Localhost References and Blank Page}
+\begin{description}[style=unboxed,leftmargin=0pt]
+    \item[Problem 1:] The deployed application on Netlify was observed making network requests to \texttt{localhost:4000}, indicating a configuration bleed-through from the development environment.
+    \item[AI Assistance (Diagnostics):]
+        \begin{itemize}
+            \item Performed a codebase-wide text search (\texttt{grep}) specifically for the string \texttt{localhost:4000}.
+            \item Analysed the search results, identifying occurrences primarily within local testing configurations (\texttt{playwright.config.ts}, end-to-end test files). Concluded these were unlikely to affect the production build directly.
+            \item Reviewed user-provided Netlify environment variables (\texttt{VITE\_SUPABASE\_URL}, \texttt{VITE\_SUPABASE\_ANON\_KEY}, etc.) to confirm they were correctly set and did not contain localhost references.
+            \item Read the Supabase client initialisation file (\texttt{src/lib/supabase.ts}) to verify that production Supabase URLs were being correctly sourced from \texttt{import.meta.env} variables, confirming proper configuration loading.
+        \end{itemize}
+    \item[Problem 2:] Users reported encountering a blank white page upon accessing the deployed site, with no apparent errors in the browser console.
+    \item[AI Assistance (Debugging Strategy \& Implementation):]
+        \begin{itemize}
+            \item Proposed simplifying the main application component (\texttt{src/App.tsx}) to isolate the issue. The strategy was to render only a minimal static element (e.g., \texttt{<h1>Hello Test</h1>}) to test the core Vite build, Netlify deployment, and base HTML rendering pipeline.
+            \item Edited \texttt{src/App.tsx} to implement this simplification, commenting out existing routing and component logic.
+            \item Generated the necessary Git commands (\texttt{git add}, \texttt{git commit}, \texttt{git push}) to deploy this temporary diagnostic version to Netlify.
+        \end{itemize}
+    \item[Outcome:] The "Hello Test" message rendered successfully on the live site. This validated the build process and infrastructure, strongly suggesting the blank page issue stemmed from the React application's runtime logic (components, routing, or state initialisation) rather than the build or deployment itself.
+    \item[AI Assistance (Cleanup):] Generated Git commands (\texttt{git revert HEAD --no-edit}, \texttt{git push}) to revert the temporary diagnostic commit and restore the original \texttt{src/App.tsx} code.
+\end{description}
+
+\subsection{Resolving Netlify SPA 404 Errors}
+\begin{description}[style=unboxed,leftmargin=0pt]
+    \item[Problem:] After restoring the application code, directly accessing specific application routes (e.g., \texttt{https://<site-name>.netlify.app/auth}) resulted in a Netlify-generated "Page not found" 404 error, even though the route was defined in React Router.
+    \item[AI Assistance (Diagnosis \& Solution):]
+        \begin{itemize}
+            \item Diagnosed the issue as a standard behaviour for Single Page Applications (SPAs) deployed on static hosting platforms like Netlify. Explained that Netlify's server attempts to find a physical file matching the path (\texttt{/auth}) and fails, requiring a rewrite rule.
+            \item Proposed the standard Netlify solution: creating a \texttt{\_redirects} file in the project's public output directory (\texttt{public/} for Vite, typically copied to \texttt{dist/} during build).
+            \item Specified the necessary redirect rule:
+            \begin{minted}{text}
+/* /index.html 200
+            \end{minted}
+            Explained that this rule instructs Netlify to serve the root \texttt{index.html} file for any requested path that doesn't match a physical file, allowing React Router to take over routing client-side.
+            \item Created the new file \texttt{public/\_redirects} and added the specified rule.
+            \item Generated Git commands to commit and push the new \texttt{\_redirects} file.
+        \end{itemize}
+    \item[Outcome:] Direct navigation to application routes (e.g., \texttt{/auth}) correctly loaded the main \texttt{index.html} and allowed React Router to render the appropriate component, resolving the 404 errors.
+\end{description}
+
+\subsection{Addressing Root URL Blank Rendering}
+\begin{description}[style=unboxed,leftmargin=0pt]
+    \item[Problem:] While direct access to \texttt{/auth} now worked, accessing the root URL (\texttt{/}) resulted in a blank page again.
+    \item[AI Assistance (Diagnosis \& Implementation):]
+        \begin{itemize}
+            \item Reviewed the current state of \texttt{src/App.tsx}. Identified that the main route block defining the application layout and protected routes (including the handler for \texttt{/}) had been commented out during earlier debugging stages and not yet restored after reverting the "Hello Test" commit.
+            \item Edited \texttt{src/App.tsx} to uncomment and restore the primary \texttt{<Route path="/*">} element containing the application \texttt{Layout} and nested routes for paths like \texttt{/}, \texttt{/mood}, etc.
+            \item Generated Git commands to commit and push the restored routing logic.
+        \end{itemize}
+    \item[Outcome:] Accessing the root URL now correctly attempted to render the main application structure, leading into the next phase of authentication and state-related debugging.
+\end{description}
+
+\subsection{Complex Authentication Flow \& State Management Debugging}
+This phase involved resolving issues related to user sessions, terms acceptance state, and redirects between authentication, terms, and main application pages.
+
+\subsubsection{Diagnosing the Redirect Loop (Auth -> Terms -> Auth)}
+\begin{description}[style=unboxed,leftmargin=0pt]
+    \item[Problem:] Users signing up were correctly redirected to the \texttt{/terms} page, but upon accepting terms, they were caught in a rapid redirect loop, often ending up back at \texttt{/auth} or seeing browser navigation throttling warnings (\texttt{Throttling navigation...}). Console logs sometimes showed "[AuthGuard] No session".
+    \item[AI Assistance (Initial Checks):]
+        \begin{itemize}
+            \item Read \texttt{src/store/index.ts} to confirm that the \texttt{disclaimerStatus} state slice, which holds the terms acceptance flag, was configured for persistence via \texttt{zustand/middleware}. This ruled out simple non-persistence as the sole cause.
+            \item Read \texttt{src/pages/TermsPage.tsx} to verify its logic. Confirmed it correctly called the Zustand action \texttt{setDisclaimerAccepted(true)} and then used React Router's \texttt{navigate('/')} upon acceptance.
+        \end{itemize}
+    \item[AI Assistance (AuthGuard Analysis):]
+        \begin{itemize}
+            \item Read the existing \texttt{src/components/AuthGuard.tsx} component.
+            \item Diagnosed a critical flaw: The guard checked only for the presence of a Supabase \texttt{session} but did \textbf{not} check the \texttt{disclaimerStatus.accepted} flag from the Zustand store.
+            \item Hypothesised that this allowed users with a session but unaccepted terms to pass the guard momentarily, only to be redirected back by logic potentially existing within the main \texttt{Layout} or \texttt{ChatPage} components, or that state updates were not propagating quickly enough across the redirects.
+        \end{itemize}
+\end{description}
+
+\subsubsection{Refactoring AuthGuard and State Handling}
+\begin{description}[style=unboxed,leftmargin=0pt]
+    \item[AI Assistance (AuthGuard Fix):]
+        \begin{itemize}
+            \item Edited \texttt{src/components/AuthGuard.tsx} to incorporate checks for both \texttt{session} and \texttt{disclaimerStatus.accepted}.
+            \item Implemented the following logic within the guard's \texttt{useEffect}:
+                \begin{itemize}
+                    \item If \texttt{session === null}, redirect to \texttt{/auth}.
+                    \item If \texttt{session} exists but \texttt{disclaimerStatus.accepted === false}, redirect to \texttt{/terms}.
+                    \item If \texttt{session} exists AND \texttt{disclaimerStatus.accepted === true}, allow rendering of children.
+                \end{itemize}
+             \item Added console logs for clarity during redirection decisions.
+        \end{itemize}
+    \item[AI Assistance (Login Error Reporting):]
+         \begin{itemize}
+             \item Modified the error handling in the \texttt{handleEmailSignIn} function within \texttt{src/pages/AuthPage.tsx} (specifically for the login path) to display the specific error message received from \texttt{supabase.auth.signInWithPassword} (e.g., \texttt{error.message}) instead of a generic "Invalid credentials" message. This was crucial for later diagnosing the CAPTCHA issue.
+         \end{itemize}
+    \item[AI Assistance (Session State Refactoring - \texttt{createBrowserClient}):]
+         \begin{itemize}
+             \item Despite the AuthGuard fix, the "No session" redirect loop persisted.
+             \item Read \texttt{src/lib/supabase.ts} again. Identified that it was using the basic \texttt{createClient} from \texttt{@supabase/supabase-js}.
+             \item Diagnosed that for client-side SPAs, especially those involving redirects and complex state management across page loads, \texttt{createBrowserClient} from the \texttt{@supabase/ssr} package is necessary for reliable session persistence using browser storage (\texttt{localStorage}).
+             \item Edited \texttt{src/lib/supabase.ts} to replace \texttt{createClient} with \texttt{createBrowserClient}.
+        \end{itemize}
+     \item[AI Assistance (Centralising State Management):]
+         \begin{itemize}
+             \item Updated the Zustand store (\texttt{src/store/index.ts}) to explicitly include \texttt{session: Session | null} in its state and added a corresponding \texttt{setSession} action.
+             \item Refactored \texttt{src/App.tsx}:
+                \begin{itemize}
+                    \item Removed the local \texttt{useState} hook previously used to manage the session.
+                    \item Modified the \texttt{useEffect} hook that handles \texttt{supabase.auth.getSession} and \texttt{onAuthStateChange} to call the Zustand actions \texttt{setSession} and \texttt{setUser} directly, making Zustand the single source of truth for auth state.
+                    \item Removed the complex inline conditional rendering logic previously used for the \texttt{/*} route.
+                    \item Correctly wrapped the protected \texttt{<Layout>} component (containing nested routes) within the refactored \texttt{<AuthGuard>} component for the \texttt{/*} path. Public routes (\texttt{/auth}, \texttt{/terms}) remained outside the guard.
+               \end{itemize}
+        \end{itemize}
+    \item[AI Assistance (Committing Changes):] Generated Git commands to commit the sequence of changes to \texttt{AuthGuard.tsx}, \texttt{AuthPage.tsx}, \texttt{store/index.ts}, \texttt{lib/supabase.ts}, and \texttt{App.tsx}.
+    \item[Outcome:] The combination of using \texttt{createBrowserClient}, centralising session state in Zustand, and implementing a robust \texttt{AuthGuard} checking both session and terms acceptance successfully resolved the redirect loops.
+\end{description}
+
+\subsection{Resolving Build Failures}
+Deployment was intermittently blocked by build failures on Netlify.
+
+\subsubsection{Missing Dependencies}
+\begin{description}[style=unboxed,leftmargin=0pt]
+    \item[Problem:] An early build failed with errors indicating that \texttt{@react-three/fiber} and related packages could not be resolved.
+    \item[AI Assistance:]
+        \begin{itemize}
+            \item Read \texttt{package.json} and confirmed these dependencies were missing from the main \texttt{dependencies} list (likely installed locally during development but not saved).
+            \item Attempted to run \texttt{npm install @react-three/fiber three @react-three/drei} via the terminal tool (this specific command failed due to unrelated PowerShell/terminal rendering issues on the user's machine, though the intent was correct).
+            \item Generated Git commands assuming the user would manually add the dependencies and commit the updated \texttt{package.json} and \texttt{package-lock.json}.
+        \end{itemize}
+    \item[Outcome:] Subsequent builds passed this specific check once dependencies were correctly listed.
+\end{description}
+
+\subsubsection{Dependency Resolution (\texttt{@supabase/ssr})}
+\begin{description}[style=unboxed,leftmargin=0pt]
+    \item[Problem:] After introducing \texttt{createBrowserClient}, Netlify builds started failing with Rollup errors, unable to resolve the import for \texttt{"@supabase/ssr"} from \texttt{src/lib/supabase.ts}, despite the package being present in \texttt{package.json}.
+    \item[AI Assistance (Troubleshooting):]
+        \begin{itemize}
+            \item Hypothesised the cause was either a stale Netlify build cache or an inconsistent \texttt{package-lock.json}.
+            \item First recommendation: Trigger a new Netlify deploy with the "Clear cache and deploy site" option. (This did not resolve the issue).
+            \item Second recommendation: Instructed the user to regenerate the lockfile locally by deleting \texttt{node\_modules} and \texttt{package-lock.json}, running \texttt{npm install}, and then committing the newly generated \texttt{package-lock.json}.
+            \item Generated Git commands to commit the regenerated lockfile.
+        \end{itemize}
+    \item[Outcome:] Deploying to Netlify with a cleared cache *after* committing the regenerated \texttt{package-lock.json} successfully resolved the build error. The build process could now correctly find and bundle the \texttt{@supabase/ssr} package.
+\end{description}
+
+\subsection{Configuring CAPTCHA Protection}
+\begin{description}[style=unboxed,leftmargin=0pt]
+    \item[Problem:] Following the resolution of build and redirect issues, standard email/password logins began failing with a Supabase error: \texttt{AuthApiError: captcha verification process failed}.
+    \item[AI Assistance (Diagnosis):]
+        \begin{itemize}
+            \item Explained that this specific error, when occurring during a standard \texttt{signInWithPassword} call where the frontend code does *not* include a CAPTCHA token, indicates that Supabase's server-side CAPTCHA protection setting is enabled for password logins.
+            \item Clarified that this Supabase setting enforces the check regardless of frontend implementation for that specific flow.
+        \end{itemize}
+    \item[AI Assistance (Solution Options):]
+         \begin{itemize}
+             \item Recommended Solution 1 (Simplest): Disable the "Enable CAPTCHA protection" toggle within the Supabase project's Authentication settings dashboard.
+             \item Solution 2 (User Preference): Acknowledged the user's decision to keep the Supabase setting enabled for security and instead implement the CAPTCHA challenge on the frontend for the login flow as well.
+         \end{itemize}
+    \item[AI Assistance (Implementation for Login CAPTCHA):]
+         \begin{itemize}
+             \item Edited \texttt{src/pages/AuthPage.tsx} to add necessary state (\texttt{isWaitingForLoginCaptcha}).
+             \item Modified the \texttt{handleEmailSignIn} function: instead of calling \texttt{signInWithPassword} directly for the login case, it now sets the \texttt{isWaitingForLoginCaptcha} state and opens the HCaptcha modal.
+             \item Extended the \texttt{handleCaptchaVerified} function: added an \texttt{else if} block to check for \texttt{isWaitingForLoginCaptcha}. Inside this block, it calls \texttt{signInWithPassword}, passing the received \texttt{token} in the \texttt{options.captchaToken} field. It also handles success/error states and resets the waiting flag.
+             \item Updated the text content (title, description) within the CAPTCHA modal to dynamically reflect whether it's verifying a signup, login, or anonymous continuation.
+            \item Generated Git commands to commit the changes.
+         \end{itemize}
+    \item[Outcome:] Email/password logins now correctly present the CAPTCHA challenge, and upon successful verification, pass the required token to Supabase, allowing the login to proceed (assuming credentials are valid).
+\end{description}
+
+\subsection{Enhancements to User Settings Page}
+Following the resolution of core deployment and authentication issues, AI assistance was utilised for refining the user experience within the application's settings page (\texttt{src/pages/SettingsPage.tsx}).
+\begin{description}[style=unboxed,leftmargin=0pt]
+    \item[Problem 1:] The tooltip displayed next to the "Phone Number (Optional)" input field was static and did not reflect the user's currently saved phone number.
+    \item[AI Assistance (Implementation):]
+        \begin{itemize}
+            \item Edited \texttt{src/pages/SettingsPage.tsx} to modify the \texttt{<Tooltip>} component associated with the phone number input.
+            \item Implemented logic within the tooltip's \texttt{content} prop using a ternary operator to dynamically display either the user's saved phone number (accessed via \texttt{user?.phone}) or the message "No phone number saved" if no phone number was present in the user state.
+        \end{itemize}
+    \item[Problem 2:] The mouse cursor displayed as a question mark (\texttt{cursor-help}) when hovering over the information icon triggering the phone number tooltip, which was inconsistent with typical clickable/interactive element cues.
+    \item[AI Assistance (Refinement):]
+        \begin{itemize}
+            \item Edited \texttt{src/pages/SettingsPage.tsx} again, specifically targeting the \texttt{<Info>} icon component nested within the \texttt{<Tooltip>}.
+            \item Updated the Tailwind CSS classes applied to the \texttt{<Info>} icon, changing \texttt{cursor-help} to \texttt{cursor-pointer} to provide a more intuitive hand cursor on hover, indicating potential interactivity (even though the icon itself isn't directly clickable, it triggers the tooltip).
+        \end{itemize}
+    \item[Outcome:] The tooltip now accurately reflects the user's saved phone number status, and the hover interaction provides a standard cursor cue, enhancing the usability of the settings interface.
+\end{description}
+
+\section{Conclusion and Ethical Considerations}
+The collaboration detailed in this report demonstrates a productive and ethical application of an AI programming assistant in a real-world software development scenario. The AI served as a force multiplier for debugging, rapidly analysing code, searching for patterns, recalling relevant documentation patterns (like SPA redirects or Supabase client types), and implementing targeted changes based on an evolving understanding of the interconnected issues.
+
+Where appropriate, the AI generated explicit step-by-step plans before taking action, allowing for user review and ensuring alignment. For instance, when tackling the Netlify SPA 404 errors, the plan was:
+\begin{enumerate}
+    \item Explain the cause (Netlify server seeking non-existent static file for client-side route).
+    \item Propose the solution (Create a \texttt{\_redirects} file in \texttt{public/}).
+    \item Specify the rule (\texttt{/* /index.html 200}) to serve the main HTML file.
+    \item Implement the file creation.
+    \item Instruct on committing and pushing the change.
+    \item Request user verification post-deployment.
+\end{enumerate}
+This structured approach, driven by user prompts and refined by the AI's planning capability, enabled a more methodical and quantitatively trackable process for diagnosing and resolving complex issues.
+
+Key aspects of the collaboration supporting ethical use include:
+\begin{itemize}
+    \item \textbf{User Control:} All actions performed by the AI, particularly code edits and terminal commands, were either explicitly requested or proposed as part of a plan that the user reviewed and approved before execution.
+    \item \textbf{Transparency:} The AI explained its reasoning for diagnoses and proposed solutions, referencing specific code sections or error messages.
+    \item \textbf{Iterative Refinement:} The process was iterative, with the AI adapting its approach based on user feedback, observed outcomes, and new information revealed during debugging.
+    \item \textbf{Focus on Augmentation:} The AI augmented the developer's capabilities by handling time-consuming analysis and boilerplate code generation, allowing the developer to focus on higher-level strategy, decision-making, and verifying the correctness of the implemented solutions.
+    \item \textbf{Clear Scope:} The AI's role was confined to technical assistance within the defined problem space, without making autonomous decisions about application features or security policies (e.g., the decision to implement login CAPTCHA was the user's).
+\end{itemize}
+
+This detailed log serves as evidence of a responsible partnership between human developers and AI tools to overcome complex technical challenges in software engineering.
+
+\section*{Cursor Rules Usage}
+This project utilised Cursor Rules (\url{https://github.com/PatrickJS/awesome-cursorrules}) to enhance the AI assistant's performance and ensure adherence to specific coding standards and interaction styles. These rules are essentially pre-defined system prompts provided via \texttt{.mdc} files, guiding the AI's responses.
+
+The following rule files were active during various stages of the collaboration:
+\begin{itemize}
+    \item \texttt{cursor-rules-rasa.mdc}: Provided context and guidelines for working with the Rasa conversational AI framework (This was utilised while working on the RASA framework for the model development).
+    \item \texttt{git-conventional-commit-messages.mdc}: Enforced the use of the Conventional Commits specification for Git commit messages generated by the AI.
+    \item \texttt{github-code-quality-cursorrules-prompt-file.mdc}: Contained general rules enforcing code quality checks and specific interaction constraints (e.g., no apologies, file-by-file changes).
+    \item \texttt{github-cursorrules-prompt-file-instructions.mdc}: Provided high-level guidance on writing clean, readable, and maintainable code, referencing principles from Robert C. Martin's "Clean Code".
+    \item \texttt{python-cursorrules-prompt-file-best-practices.mdc} \& \texttt{python-projects-guide-cursorrules-prompt-file.mdc}: Offered detailed guidelines for Python development, including project structure, typing, testing (pytest), documentation (docstrings), and style consistency (Ruff) (primarily relevant for the model development side).
+    \item \texttt{typescript-rules.mdc}: Defined specific coding standards for TypeScript development, emphasising functional programming, proper naming conventions, file organisation, type safety (preferring types over interfaces where applicable), and best practices for libraries like Zod and Axios.
+\end{itemize}
+
+Furthermore, specific user-provided instructions (often referred to as "user rules" or custom instructions within the prompts) played a crucial role. These instructions, provided directly in the chat interface, dynamically refined the AI's behaviour, demanding directness, accuracy, expert-level interaction, and adherence to specific formatting preferences, while prohibiting certain conversational patterns like summaries or unnecessary confirmations. This combination of pre-defined rule files and dynamic user instructions created a tailored and effective collaborative environment.
+
+\section*{References}
+\begin{thebibliography}{99} % Increased number to avoid potential label issues
+
+\bibitem{hcaptchaReact}
+HCaptcha (2025) \textit{hcaptcha/react-hcaptcha GitHub Repository}. Available at: \url{https://github.com/hCaptcha/react-hcaptcha} (Accessed: 16 April 2025).
+
+\bibitem{gitDocs}
+Git Project (2025) \textit{Git Documentation}. Available at: \url{https://git-scm.com/doc} (Accessed: 16 April 2025).
+
+\bibitem{soGitMerge}
+Jimmy (2010) Answer to 'How do I finish the merge after resolving my merge conflicts?'. \textit{Stack Overflow}, 18 March. Available at: https://stackoverflow.com/questions/2474097/how-do-i-finish-the-merge-after-resolving-my-merge-conflicts (Accessed: 15 April 2025).
+
+\bibitem{mdnFlexbox}
+MDN Web Docs (2025) \textit{Basic concepts of flexbox}. Available at: \url{https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Flexible_Box_Layout/Basic_Concepts_of_Flexbox} (Accessed: 16 April 2025).
+
+\bibitem{netlifyDocs}
+Netlify (2025) \textit{Netlify Documentation}. Available at: \url{https://docs.netlify.com/} (Accessed: 16 April 2025).
+
+\bibitem{netlifyRedirects}
+Netlify (2025) \textit{Redirects and rewrites}. Available at: \url{https://docs.netlify.com/routing/redirects/} (Accessed: 15 April 2025).
+
+\bibitem{nextUI}
+NextUI (2025) \textit{NextUI Documentation}. Available at: \url{https://nextui.org/docs} (Accessed: 16 April 2025).
+
+\bibitem{pozoSupabaseDeadlock}
+Pozo, T. (2025) \textit{Lovable + Supabase how to fix: Application hangs up after user logs in}. Available at: https://tomaspozo.com/articles/series-lovable-supabase-errors-application-hangs-up-after-log-in (Accessed: 15 April 2025).
+
+\bibitem{reactDocs}
+React Team (2025) \textit{React Documentation}. Available at: \url{https://react.dev/} (Accessed: 16 April 2025).
+
+\bibitem{reactHotToast}
+Tim Lindner (2025) \textit{React Hot Toast Documentation}. Available at: \url{https://react-hot-toast.com/} (Accessed: 16 April 2025).
+
+\bibitem{reactMemo}
+React Team (2025) \textit{React.memo API Reference}. Available at: https://react.dev/reference/react/memo (Accessed: 15 April 2025).
+
+\bibitem{reactRouter}
+Remix Software (2025) \textit{React Router Documentation}. Available at: \url{https://reactrouter.com/en/main} (Accessed: 16 April 2025).
+
+\bibitem{r3fDreiDocs}
+Poimandres (2025) \textit{React Three Drei Documentation}. Available at: \url{https://github.com/pmndrs/drei} (Accessed: 16 April 2025).
+
+\bibitem{r3fDocs}
+Poimandres (2025) \textit{React Three Fiber Documentation}. Available at: \url{https://docs.pmnd.rs/react-three-fiber/getting-started/introduction} (Accessed: 16 April 2025).
+
+\bibitem{stemkoskiGlow}
+Stemkoski, L. (2013) 'Shaders in Three.js: glow and halo effects revisited', \textit{Computational Contemplations}, 5 July. Available at: https://stemkoski.blogspot.com/2013/07/shaders-in-threejs-glow-and-halo.html (Accessed: 15 April 2025).
+
+\bibitem{supabaseAuth}
+Supabase (2025) \textit{Supabase Auth Documentation}. Available at: \url{https://supabase.com/docs/guides/auth} (Accessed: 16 April 2025).
+
+\bibitem{supabaseCaptcha}
+Supabase (2025) \textit{Auth CAPTCHA}. Available at: \url{https://supabase.com/docs/guides/auth/auth-captcha} (Accessed: 15 April 2025).
+
+\bibitem{supabaseSecrets}
+Supabase (2025) \textit{Managing Secrets (Environment Variables)}. Available at: https://supabase.com/docs/guides/functions/secrets (Accessed: 15 April 2025).
+
+\bibitem{supabaseSSR}
+Supabase (2025) \textit{Auth Helpers - Server-Side Rendering - createBrowserClient}. Available at: \url{https://supabase.com/docs/guides/auth/server-side-rendering#createbrowserclient} (Accessed: 15 April 2025).
+
+\bibitem{tailwindCSSOverflow}
+Tailwind Labs (2025) \textit{Tailwind CSS Documentation - Overflow}. Available at: \url{https://tailwindcss.com/docs/overflow} (Accessed: 16 April 2025).
+
+\bibitem{threejsDocs}
+Three.js Authors (2025) \textit{Three.js Documentation}. Available at: \url{https://threejs.org/docs/} (Accessed: 16 April 2025).
+
+\bibitem{typescriptHandbook}
+Microsoft (2025) \textit{TypeScript Handbook}. Available at: \url{https://www.typescriptlang.org/docs/handbook/intro.html} (Accessed: 16 April 2025).
+
+\bibitem{vite}
+Vite Team (2025) \textit{Vite Documentation}. Available at: \url{https://vitejs.dev/guide/} (Accessed: 16 April 2025).
+
+\bibitem{viteEnvVars}
+Vite Team (2025) \textit{Env Variables and Modes}. Available at: \url{https://vitejs.dev/guide/env-and-mode} (Accessed: 16 April 2025).
+
+\bibitem{zustand}
+Poimandres (2025) \textit{Zustand Documentation}. Available at: \url{https://docs.pmnd.rs/zustand/getting-started/introduction} (Accessed: 16 April 2025).
+
+\bibitem{zustandMiddleware}
+Poimandres (2025) \textit{Zustand Middleware}. Available at: \url{https://docs.pmnd.rs/zustand/integrations/middleware} (Accessed: 16 April 2025).
+% --- End of added references --- 
+
+\end{thebibliography}
+
+\appendix
+\section*{Appendix: Detailed AI Collaboration Summary (UI/3D/Debugging)}
+This appendix details collaboration aspects beyond the primary deployment/auth debugging flow, drawing from previous conversation summaries.
+
+\subsection*{UI Implementation and Refinement}
+The AI assistant provided significant help in iterating on user interface elements, particularly within \texttt{CompanionPage.tsx} and related components:
+\begin{itemize}
+    \item \textbf{Button Refactoring:} Assisted in moving UI controls (e.g., \texttt{"Try a call"}, \texttt{"Listening"}, \texttt{"Mute"}) from 3D-positioned HTML elements within the \texttt{@react-three/drei <Html>} component to standard HTML elements positioned absolutely outside the main \texttt{<Canvas>}. This ensured the buttons remained fixed on the screen regardless of 3D camera movement.
+    \item \textbf{Button State Management:} Implemented state toggling for UI elements:
+    \begin{itemize}
+        \item The mute button state (\texttt{isMuted}) was added, along with logic to conditionally display a slash overlay and update the hover tooltip (\texttt{title} attribute) to \texttt{"Mute microphone"} or \texttt{"Unmute microphone"}.
+        \item The main interaction button state (\texttt{agentState}) was added to toggle the display text between \texttt{"Listening"} and \texttt{"Talk to interrupt"}.
+    \end{itemize}
+    \item \textbf{Iconography:} Replaced default icons/emojis with specific alternatives, including generating and integrating SVG code for an audio wave icon and a standard microphone icon.
+    \item \textbf{Styling:} Adjusted CSS styles for buttons (padding, background color, text color) based on user requests, including applying the project's theme color (\texttt{\#FF007A}).
+    \item \textbf{Modal Enhancement:} Modified the \texttt{TermsModal} component to increase its \texttt{minHeight} and adjusted internal element spacing (margins, padding) using flexbox properties for better layout.
+    \item \textbf{Tooltip Enhancement:} Modified the tooltip on the Settings page to dynamically display the user's phone number from state or a default message if unavailable. Updated tooltip hover cursor style.
+\end{itemize}
+
+\subsection*{Three.js / React Three Fiber Development}
+Assistance was provided for enhancing and debugging the 3D scene in \texttt{CompanionPage.tsx}:
+\begin{itemize}
+    \item \textbf{Initial Sphere Visuals:} Iteratively refined the appearance of the initial sphere by modifying its GLSL shader code:\
+    \begin{itemize}
+        \item Implemented a subtle pulsing effect on the highlights by adding a \texttt{uTime} uniform and modulating the highlight's \texttt{smoothstep} range based on time.
+        \item Adjusted the spread/sharpness of highlights (\texttt{uHighlightSharpness} uniform).
+        \item Added a faint internal core glow effect by calculating the dot product between the view direction and surface normal, using this to brighten the center and darken the edges for increased contrast.
+    \end{itemize}
+    \item \textbf{Neutron Star Animation:} Debugged an issue where the neutron star animation visually froze when parent component state changed. The AI identified the likely cause as unnecessary re-renders and implemented \texttt{React.memo} around the \texttt{AnimatingSphere} component to resolve it. Diagnostic \texttt{console.log} statements were added and removed during this process.
+    \item \textbf{Zoom Animation Easing:} Modified the camera zoom-in animation logic within the \texttt{AnimationController} to start slower and accelerate, providing a smoother ease-in effect instead of a linear transition.
+\end{itemize}
+
+\subsection*{Debugging and Troubleshooting (Other)}
+\begin{itemize}
+    \item \textbf{Supabase Login Issues (Early):} Assisted in diagnosing a post-login error page by explaining common causes, particularly the potential deadlock in \texttt{onAuthStateChange} if asynchronous operations are not handled correctly (e.g., without \texttt{setTimeout}), based on Supabase documentation and user-provided search results.
+    \item \textbf{Netlify Environment Variables:} Explained the necessity of configuring environment variables (like \texttt{VITE\_SUPABASE\_URL} and \texttt{VITE\_SUPABASE\_ANON\_KEY}) in the Netlify deployment settings, as local \texttt{.env} files are not automatically used in the deployed build.
+\end{itemize}
+
+\end{document} 

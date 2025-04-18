@@ -1,0 +1,44 @@
+\documentclass{article}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\geometry{a4paper, margin=1in}
+
+\title{Project Acknowledgements}
+\author{}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section*{Introduction}
+This document outlines the sources of inspiration, tools, and collaborative efforts involved in the development of the UniMind web application.
+
+\section*{Initial Structure and AI Collaboration}
+The foundational structure and template for the web application were initially generated using \href{https://bolt.new/}{bolt.new}, leveraging \textbf{Claude 3.7 Sonnet}. This involved multiple collaborative prompts and debugging sessions, also heavily utilizing AI assistance. The development process followed the features outlined in documents within the \texttt{misc} directory, implementing them incrementally.
+
+\section*{Feature Inspirations}
+\begin{itemize}
+    \item \textbf{Chat Interface:} The design goal was to emulate the simplicity and functionality of the \href{https://chatgpt.com/}{ChatGPT} interface.
+    \item \textbf{UI Underglow Effect:} The subtle underglow effect present on various pages was inspired by the implementation seen on the \href{https://bolt.new/}{bolt.new} website.
+    \item \textbf{Logo:} The logo's aesthetic drew inspiration from the branding noted on the \href{https://allenai.org/}{Allen Institute for AI (AI2)} website, which was observed during parallel work on the separate iOS version of the application. The final logo image was generated using GPT-4o's image generation capabilities.
+    \item \textbf{Companion Mode:} The initial concept for the interactive "Companion Mode" orb was inspired by similar elements on the \href{https://elevenlabs.io/app/conversational-ai/agents}{Eleven Labs} website. This concept evolved, taking further inspiration from space, particularly the visual transformation process of a star into a neutron star, aiming to create an engaging and visually interesting user experience.
+    \item \textbf{Mood Tracker:} The primary inspiration for the Mood Tracker feature came from the user interface and functionality observed in the \href{https://www.youper.ai/}{Youper} iOS application.
+\end{itemize}
+
+\section*{Development Process and Testing}
+While AI played a significant role in generating initial code and assisting with debugging, substantial effort was dedicated to testing and refinement. This included:
+\begin{itemize}
+    \item Writing unit tests where applicable.
+    \item Extensive use of console logging to trace behaviour and debug features.
+    \item Utilising external resources like Perplexity for research on common debugging techniques (e.g., addressing path case-sensitivity differences between Linux, Windows, and macOS).
+\end{itemize}
+
+\section*{Connection to iOS Version}
+It's worth noting that some features, particularly the Mood Tracker, were initially conceptualised or built in a similar form within the separate native iOS project, available at \href{https://github.com/ryantigi254/Mental-Health-Chatbot-App}{ryantigi254/Mental-Health-Chatbot-App}, before being adapted for this web application.
+
+\section*{Further Details on AI Collaboration}
+For a more detailed breakdown of how AI was specifically used throughout the project development lifecycle, please refer to the \texttt{misc/ai\_collaboration\_report.tex} document.
+
+\end{document} 
