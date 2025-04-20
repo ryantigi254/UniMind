@@ -214,7 +214,7 @@ const CompanionPage: React.FC = () => {
   const AnimationController = () => {
     const { camera, gl } = useThree(); // Hooks are valid because it will be rendered inside Canvas
     const resetTarget = useMemo(() => new THREE.Vector3(0, 0, 0), []); // Target for controls reset
-    const resetSpeed = 5.0; // Speed for camera reset animation
+    const resetSpeed = 2.0; // Decreased speed for smoother reset (was 5.0)
     const epsilon = 0.01; // Threshold for checking closeness
 
     useFrame((state, delta) => {
