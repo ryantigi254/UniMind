@@ -13,7 +13,7 @@ import vertexShader from '../components/three/shaders/persona.vert?raw';
 import fragmentShader from '../components/three/shaders/persona.frag?raw';
 
 // Define animation phases
-type AnimationPhase = 'idle' | 'zoomingIn' | 'neutronStarVisible';
+type AnimationPhase = 'idle' | 'resettingCamera' | 'zoomingIn' | 'neutronStarVisible';
 
 // Define background colors
 const initialBgColor = new THREE.Color('#1a1a2e'); // Dark space blue
@@ -192,10 +192,10 @@ const CompanionPage: React.FC = () => {
   };
 
   const handleEnterCall = () => {
-    console.log("Starting zoom sequence...");
-    setAnimationPhase('zoomingIn');
+    console.log("Starting camera reset sequence...");
+    setAnimationPhase('resettingCamera'); // Start with reset phase
     if (controlsRef.current) {
-      controlsRef.current.enabled = false; 
+      controlsRef.current.enabled = false; // Disable controls immediately
     }
   };
 
@@ -213,6 +213,9 @@ const CompanionPage: React.FC = () => {
   // This component now *must* be rendered INSIDE <Canvas>
   const AnimationController = () => {
     const { camera, gl } = useThree(); // Hooks are valid because it will be rendered inside Canvas
+    const resetTarget = useMemo(() => new THREE.Vector3(0, 0, 0), []); // Target for controls reset
+    const resetSpeed = 5.0; // Speed for camera reset animation
+    const epsilon = 0.01; // Threshold for checking closeness
 
     useFrame((state, delta) => {
       // Update refs used by Canvas props
@@ -220,40 +223,73 @@ const CompanionPage: React.FC = () => {
       if (camera instanceof THREE.PerspectiveCamera) {
           cameraFovRef.current = camera.fov;
       }
-      
-      // Only run animation logic if in zoomingIn phase
-      if (animationPhase !== 'zoomingIn') return; 
 
-      // --- Animation Logic --- 
-      const minZoomSpeed = 0.5;
-      const maxZoomSpeed = 2.5;
-      const distTotal = zoomedOutPos.distanceTo(zoomedInPos);
-      const distCurrent = camera.position.distanceTo(zoomedInPos);
-      const progress = distTotal > 0.001 ? Math.max(0, Math.min(1, 1 - distCurrent / distTotal)) : 1;
-      const currentZoomSpeed = minZoomSpeed + (maxZoomSpeed - minZoomSpeed) * progress;
+      // --- Camera Reset Logic ---
+      if (animationPhase === 'resettingCamera') {
+        camera.position.lerp(zoomedOutPos, delta * resetSpeed);
+        let targetResetComplete = true; // Assume true if no controls
 
-      camera.position.lerp(zoomedInPos, delta * currentZoomSpeed);
-      tempBgColor.copy(initialBgColor).lerp(zoomedInBgColor, progress);
-      gl.setClearColor(tempBgColor);
-
-      if (camera instanceof THREE.PerspectiveCamera) {
-        camera.fov = THREE.MathUtils.lerp(initialFov, zoomedInFov, progress);
-        camera.updateProjectionMatrix();
-      }
-
-      if (distCurrent < 0.05) {
-        camera.position.copy(zoomedInPos);
-        gl.setClearColor(zoomedInBgColor);
-        if (camera instanceof THREE.PerspectiveCamera) {
-           camera.fov = zoomedInFov; 
-           camera.updateProjectionMatrix(); 
-        }
-        setAnimationPhase('neutronStarVisible');
-        console.log("Reached zoom-in point, showing Animating Sphere.");
         if (controlsRef.current) {
-          controlsRef.current.enabled = true; 
-          controlsRef.current.target.set(0, 0, 0);
+          controlsRef.current.target.lerp(resetTarget, delta * resetSpeed);
+          controlsRef.current.update(); // Necessary after changing target programmatically
+          targetResetComplete = controlsRef.current.target.distanceTo(resetTarget) < epsilon;
         }
+
+        const positionResetComplete = camera.position.distanceTo(zoomedOutPos) < epsilon;
+
+        if (positionResetComplete && targetResetComplete) {
+          // Snap to final reset position/target
+          camera.position.copy(zoomedOutPos);
+          if (controlsRef.current) {
+            controlsRef.current.target.copy(resetTarget);
+            controlsRef.current.update();
+          }
+          // Transition to next phase
+          setAnimationPhase('zoomingIn'); 
+          console.log("Camera reset complete, starting zoom.");
+        }
+      } 
+      // --- Zoom-in Logic ---
+      else if (animationPhase === 'zoomingIn') { 
+        const minZoomSpeed = 0.5;
+        const maxZoomSpeed = 2.5;
+        const distTotal = zoomedOutPos.distanceTo(zoomedInPos);
+        const distCurrent = camera.position.distanceTo(zoomedInPos);
+        const progress = distTotal > 0.001 ? Math.max(0, Math.min(1, 1 - distCurrent / distTotal)) : 1;
+        const currentZoomSpeed = minZoomSpeed + (maxZoomSpeed - minZoomSpeed) * progress;
+
+        camera.position.lerp(zoomedInPos, delta * currentZoomSpeed);
+        tempBgColor.copy(initialBgColor).lerp(zoomedInBgColor, progress);
+        gl.setClearColor(tempBgColor);
+
+        if (camera instanceof THREE.PerspectiveCamera) {
+          camera.fov = THREE.MathUtils.lerp(initialFov, zoomedInFov, progress);
+          camera.updateProjectionMatrix();
+        }
+
+        if (distCurrent < 0.05) {
+          camera.position.copy(zoomedInPos);
+          gl.setClearColor(zoomedInBgColor);
+          if (camera instanceof THREE.PerspectiveCamera) {
+            camera.fov = zoomedInFov;
+            camera.updateProjectionMatrix();
+          }
+          setAnimationPhase('neutronStarVisible');
+          console.log("Reached zoom-in point, showing Animating Sphere.");
+          if (controlsRef.current) {
+            controlsRef.current.enabled = true; // Re-enable controls AFTER zoom
+            controlsRef.current.target.set(0, 0, 0); // Ensure target is correct
+            controlsRef.current.update();
+          }
+        }
+      } 
+      // --- Ensure Target is Centered in Final State ---
+      else if (animationPhase === 'neutronStarVisible') {
+         // Optional: Ensure controls target is correct after zoom if needed
+         if (controlsRef.current && controlsRef.current.target.distanceTo(resetTarget) > epsilon) {
+             controlsRef.current.target.copy(resetTarget);
+             controlsRef.current.update();
+         }
       }
       // --- End Animation Logic ---
 
@@ -263,7 +299,7 @@ const CompanionPage: React.FC = () => {
   }; // --- End AnimationController Definition ---
 
   // Adjust visibility logic to switch spheres
-  const showInitialSphere = animationPhase === 'idle' || animationPhase === 'zoomingIn'; // Show during idle and zoom
+  const showInitialSphere = animationPhase === 'idle' || animationPhase === 'resettingCamera' || animationPhase === 'zoomingIn'; // Show during idle, reset and zoom
   const showAnimatingSphere = animationPhase === 'neutronStarVisible';
   // Enable controls only when idle
   const controlsEnabled = animationPhase === 'idle';
