@@ -7,6 +7,7 @@ import TermsPage from './pages/TermsPage';
 import ChatPage from './pages/ChatPage';
 import MoodTrackerPage from './pages/MoodTrackerPage';
 import JournalPage from './pages/JournalPage';
+import ResourcePage from './pages/ResourcePage';
 import SettingsPage from './pages/SettingsPage';
 import InfoPage from './pages/InfoPage';
 import CompanionPage from './pages/CompanionPage';
@@ -68,13 +69,14 @@ function App() {
                     <Route path="/" element={<ChatPage />} />
                     <Route path="/mood" element={<MoodTrackerPage />} />
                     <Route path="/journal" element={<JournalPage />} />
+                    <Route path="/resources" element={<ResourcePage />} />
                     <Route path="/settings" element={<SettingsPage />} />
                     <Route path="/info" element={<InfoPage />} />
                     <Route 
                       path="/companion" 
                       element={<CompanionPage />}
                     />
-                    <Route path="*" element={<Navigate to="/" replace />} />
+                    {/* <Route path="*" element={<Navigate to="/" replace />} /> */}
                   </Routes>
                 </Layout>
               </AuthGuard>
