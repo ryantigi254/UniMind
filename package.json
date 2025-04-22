@@ -27,8 +27,10 @@
     "react-dom": "^18.2.0",
     "react-google-recaptcha": "^3.1.0",
     "react-hot-toast": "^2.5.2",
+    "react-markdown": "^10.1.0",
     "react-router-dom": "^6.22.2",
     "recharts": "^2.12.2",
+    "remark-gfm": "^4.0.1",
     "three": "^0.166.1",
     "zustand": "^4.5.2"
   },
