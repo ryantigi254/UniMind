@@ -21,14 +21,6 @@ const AuthPage: React.FC = () => {
   const [isWaitingForSignupCaptcha, setIsWaitingForSignupCaptcha] = useState(false);
   const [isWaitingForLoginCaptcha, setIsWaitingForLoginCaptcha] = useState(false);
 
-  useEffect(() => {
-    if (user) {
-      if (!isCaptchaModalOpen) {
-        navigate('/');
-      }
-    }
-  }, [user, isCaptchaModalOpen, navigate]);
-
   const handleEmailSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isLoading) return;

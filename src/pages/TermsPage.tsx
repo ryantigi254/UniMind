@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../store';
 import ChatBotAvatar from '../components/ChatBotAvatar';
+import { supabase } from '../lib/supabase';
 
 const TermsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -12,8 +13,17 @@ const TermsPage: React.FC = () => {
     navigate('/');
   };
 
-  const handleBack = () => {
-    navigate('/auth');
+  const handleBack = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error("Error signing out:", error);
+      }
+      navigate('/auth');
+    } catch (error) {
+      console.error("Unexpected error during sign out:", error);
+      navigate('/auth');
+    }
   };
 
   return (
