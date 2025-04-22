@@ -98,6 +98,7 @@ const Sidebar: React.FC = () => {
   ];
 
   const handleNavigation = (path: string) => {
+    console.log(`[Sidebar] handleNavigation called with path: ${path}`);
     navigate(path);
   };
 

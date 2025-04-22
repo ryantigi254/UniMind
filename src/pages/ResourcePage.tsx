@@ -5,6 +5,8 @@ import ReactMarkdown from 'react-markdown';
 import { mockResourceEntries, ResourceEntry } from '../types/resources';
 
 const ResourcesPage: React.FC = () => {
+  console.log("[ResourcePage] Component rendering...");
+
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedResource, setSelectedResource] = useState<ResourceEntry | null>(null);
