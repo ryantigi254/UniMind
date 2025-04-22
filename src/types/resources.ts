@@ -105,7 +105,7 @@ The specific types available can vary. Check the Counselling Service website for
     title: 'Managing Anxiety & Panic Attacks',
     category: 'Self-Help',
     snippet: 'Understanding anxiety/panic and practical coping strategies.',
-    content: \`## Understanding Anxiety & Panic
+    content: `## Understanding Anxiety & Panic
 
 *   **Anxiety:** A normal feeling in difficult situations, but can become overwhelming.
 *   **Panic Attack:** Intense physical/mental symptoms (sweating, racing heart, fear). Can affect 1 in 3 people.
@@ -124,7 +124,7 @@ The specific types available can vary. Check the Counselling Service website for
 *   **NHS:** [Every Mind Matters - Anxiety](https://www.nhs.uk/every-mind-matters/mental-health-issues/anxiety/)
 *   **No Panic:** [Website & Helpline](https://www.nopanic.org.uk/)
 *   **IAPT:** [NHS Talking Therapies](https://www.nhft.nhs.uk/iapt)
-*   **Self-Help Booklets:** [Northumberland Tyne and Wear NHS](https://web.ntw.nhs.uk/selfhelp/)\`,
+*   **Self-Help Booklets:** [Northumberland Tyne and Wear NHS](https://web.ntw.nhs.uk/selfhelp/)`,
     keywords: ['anxiety', 'panic attack', 'stress', 'breathing exercise', 'coping', 'self-help', 'exams', 'worry']
   },
   {
@@ -132,7 +132,7 @@ The specific types available can vary. Check the Counselling Service website for
     title: 'Understanding Low Mood & Depression',
     category: 'Self-Help',
     snippet: 'Recognising symptoms and finding ways to cope with low mood or depression.',
-    content: \`## Understanding Low Mood & Depression
+    content: `## Understanding Low Mood & Depression
 
 *   **Low Mood:** Feeling sad, worried, or fed up. Usually passes in time.
 *   **Depression:** More intense, longer-lasting low mood impacting daily life. Can include feelings of hopelessness, low self-worth, lack of energy/interest, changes in sleep/appetite.
@@ -152,7 +152,7 @@ The specific types available can vary. Check the Counselling Service website for
 *   **NHS:** [Every Mind Matters - Low Mood](https://www.nhs.uk/every-mind-matters/mental-health-issues/low-mood/)
 *   **MIND:** [Information on Depression](https://www.mind.org.uk/information-support/types-of-mental-health-problems/depression/about-depression/)
 *   **Students Against Depression:** [Website](https://www.studentsagainstdepression.org/)
-*   **Self-Help Booklets:** [Northumberland Tyne and Wear NHS](https://web.ntw.nhs.uk/selfhelp/)\`,
+*   **Self-Help Booklets:** [Northumberland Tyne and Wear NHS](https://web.ntw.nhs.uk/selfhelp/)`,
     keywords: ['depression', 'low mood', 'sadness', 'hopelessness', 'coping', 'self-help', 'mental health', 'exercise', 'routine']
   },
     {
@@ -160,7 +160,7 @@ The specific types available can vary. Check the Counselling Service website for
     title: 'Improving Your Sleep',
     category: 'Self-Help',
     snippet: 'Tips and resources for better sleep hygiene and managing sleep problems.',
-    content: \`## Why Sleep Matters
+    content: `## Why Sleep Matters
 
 Good sleep is crucial for physical and mental health, learning, and memory consolidation.
 
@@ -178,7 +178,7 @@ Good sleep is crucial for physical and mental health, learning, and memory conso
 
 *   **NHS:** [Every Mind Matters - Sleep](https://www.nhs.uk/every-mind-matters/mental-wellbeing-tips/sleep/)
 *   **The Sleep Charity:** [Website & Advice](https://thesleepcharity.org.uk/)
-*   **Self-Help Booklets:** [Northumberland Tyne and Wear NHS - Sleeping Problems](https://web.ntw.nhs.uk/selfhelp/leaflets/Sleeping%20Problems.pdf)\`,
+*   **Self-Help Booklets:** [Northumberland Tyne and Wear NHS - Sleeping Problems](https://web.ntw.nhs.uk/selfhelp/leaflets/Sleeping%20Problems.pdf)`,
     keywords: ['sleep', 'insomnia', 'sleep hygiene', 'rest', 'schedule', 'routine', 'relaxation', 'self-help']
   },
   {
@@ -186,7 +186,7 @@ Good sleep is crucial for physical and mental health, learning, and memory conso
     title: 'Managing Stress',
     category: 'Self-Help',
     snippet: 'Understanding stress and practical techniques for coping.',
-    content: \`## Understanding Stress
+    content: `## Understanding Stress
 
 Stress is the body's reaction to pressure or demands. A little stress can be motivating, but chronic stress impacts health.
 
@@ -205,7 +205,7 @@ Stress is the body's reaction to pressure or demands. A little stress can be mot
 
 *   **NHS:** [Every Mind Matters - Stress](https://www.nhs.uk/every-mind-matters/mental-health-issues/stress/)
 *   **MIND:** [How to Manage Stress](https://www.mind.org.uk/information-support/types-of-mental-health-problems/stress/what-is-stress/)
-*   **Self-Help Booklets:** [Northumberland Tyne and Wear NHS - Stress](https://web.ntw.nhs.uk/selfhelp/leaflets/Stress.pdf)\`,
+*   **Self-Help Booklets:** [Northumberland Tyne and Wear NHS - Stress](https://web.ntw.nhs.uk/selfhelp/leaflets/Stress.pdf)`,
     keywords: ['stress', 'pressure', 'coping', 'management', 'relaxation', 'time management', 'mindfulness', 'self-help', 'wellbeing']
   },
 
@@ -215,7 +215,7 @@ Stress is the body's reaction to pressure or demands. A little stress can be mot
     title: 'Need Help in a Crisis?',
     category: 'Crisis Support',
     snippet: 'Urgent support contacts for mental health crises.',
-    content: \`## Immediate Help Needed?
+    content: `## Immediate Help Needed?
 
 **If you or someone else is in immediate danger, call 999 (UK).**
 
@@ -233,7 +233,7 @@ This chatbot cannot provide crisis intervention. Please reach out to professiona
 
 ## If You Spoke to the Chatbot About Crisis:
 
-The chatbot is designed to recognise distress and will direct you to these resources. It cannot provide therapy or ongoing support in a crisis situation. Please contact one of the services above.\`,
+The chatbot is designed to recognise distress and will direct you to these resources. It cannot provide therapy or ongoing support in a crisis situation. Please contact one of the services above.`,
     keywords: ['crisis', 'urgent help', 'emergency', 'suicide', 'self-harm', 'support lines', 'nhs', 'samaritans', 'shout', 'spectrum life', 'papyrus', 'hotline', 'immediate danger']
   },
 
@@ -243,7 +243,7 @@ The chatbot is designed to recognise distress and will direct you to these resou
     title: 'Loneliness vs. Being Alone (Nov 2024)',
     category: 'Counsellors Corner',
     snippet: 'Understanding the difference and finding ways to connect.',
-    content: \`## Being Alone vs. Feeling Lonely (Nov 2024)
+    content: `## Being Alone vs. Feeling Lonely (Nov 2024)
 
 *   **Being Alone:** Physical solitude (can be a choice or circumstance).
 *   **Feeling Lonely:** Subjective emotional experience (emptiness, sadness, longing for connection), can happen even when surrounded by others.
@@ -265,7 +265,7 @@ The chatbot is designed to recognise distress and will direct you to these resou
 *   [UON Drop-in Appointments](https://www.eventbrite.co.uk/e/counselling-and-mental-health-team-telephone-drop-in-tickets-101727260976?aff=oddtdtcreator)
 *   [NHS - Loneliness](https://www.nhs.uk/every-mind-matters/lifes-challenges/loneliness/)
 *   [MIND - Loneliness](https://www.mind.org.uk/information-support/tips-for-everyday-living/loneliness/about-loneliness/)
-*   [Podcast: Brené Brown & Dr Vivek Murthy](https://brenebrown.com/podcast/dr-vivek-murthy-and-brene-on-loneliness-and-connection)\`,
+*   [Podcast: Brené Brown & Dr Vivek Murthy](https://brenebrown.com/podcast/dr-vivek-murthy-and-brene-on-loneliness-and-connection)`,
     keywords: ['loneliness', 'alone', 'connection', 'mindfulness', 'self-compassion', 'journaling', 'social media', 'support', 'counsellors corner']
   },
   {
@@ -273,7 +273,7 @@ The chatbot is designed to recognise distress and will direct you to these resou
     title: 'Understanding Perfectionism (Jul 2024)',
     category: 'Counsellors Corner',
     snippet: 'Exploring the impact of perfectionism and strategies for managing it.',
-    content: \`## Understanding Perfectionism (Jul 2024)
+    content: `## Understanding Perfectionism (Jul 2024)
 
 Perfectionism involves setting excessively high standards and being overly critical of oneself. While striving for excellence is good, perfectionism can lead to anxiety, procrastination, and burnout.
 
@@ -297,7 +297,7 @@ Perfectionism involves setting excessively high standards and being overly criti
 
 *   University Counselling Service
 *   [Self-Compassion Resources](https://self-compassion.org/)
-*   Books like "Mind Over Mood" or "The Gifts of Imperfection"\`,
+*   Books like "Mind Over Mood" or "The Gifts of Imperfection"`,
     keywords: ['perfectionism', 'high standards', 'self-criticism', 'anxiety', 'procrastination', 'burnout', 'self-compassion', 'mindfulness', 'counsellors corner']
   },
 
@@ -307,7 +307,7 @@ Perfectionism involves setting excessively high standards and being overly criti
     title: 'University Mental Health Day',
     category: 'Uni Events & Resources',
     snippet: 'Information about the annual event promoting student mental health.',
-    content: \`## University Mental Health Day
+    content: `## University Mental Health Day
 
 This is a national event in Higher Education focusing on raising awareness, challenging stigma, and promoting conversations about student and staff mental health.
 
@@ -322,7 +322,7 @@ This is a national event in Higher Education focusing on raising awareness, chal
 
 **Stay Updated:** Check campus screens, university event pages, and student newsletters for specific details.
 
-**General UON Support:** [Counselling and Mental Health pages](https://mynorthamptonac.sharepoint.com/sites/student/Pages/counselling-and-mental-health.aspx) (Link assumes UON internal site)\`,
+**General UON Support:** [Counselling and Mental Health pages](https://mynorthamptonac.sharepoint.com/sites/student/Pages/counselling-and-mental-health.aspx) (Link assumes UON internal site)`,
     keywords: ['university mental health day', 'umhd', 'event', 'awareness', 'stigma', 'wellbeing', 'support', 'campus event']
   },
 
@@ -332,7 +332,7 @@ This is a national event in Higher Education focusing on raising awareness, chal
     title: 'Eating Disorder Awareness & Support (Feb 2025)',
     category: 'Mental Health Blog',
     snippet: 'Recognising signs and finding help for eating disorders.',
-    content: \`## Eating Disorder Awareness (Feb 2025 Blog)
+    content: `## Eating Disorder Awareness (Feb 2025 Blog)
 
 Eating Disorders can be hard to spot and impact anyone.
 
@@ -347,7 +347,7 @@ Eating Disorders can be hard to spot and impact anyone.
 
 Read Amelie's story: [Beat Helpline Appeal](https://www.beateatingdisorders.org.uk/helplineappeal/)
 
-**UON Self-Help Resources:** [Eating Problems and Eating Disorders](https://mynorthamptonac.sharepoint.com/sites/student/Pages/eating-problems-and-eating-disorders.aspx) (Link assumes UON internal site)\`,
+**UON Self-Help Resources:** [Eating Problems and Eating Disorders](https://mynorthamptonac.sharepoint.com/sites/student/Pages/eating-problems-and-eating-disorders.aspx) (Link assumes UON internal site)`,
     keywords: ['eating disorder', 'beat', 'support', 'helpline', 'awareness', 'body image', 'anorexia', 'bulimia', 'binge eating', 'blog']
   },
   {
@@ -355,7 +355,7 @@ Read Amelie's story: [Beat Helpline Appeal](https://www.beateatingdisorders.org.
     title: 'Spectrum Life: 24/7 Student Support (Oct 2024)',
     category: 'Mental Health Blog',
     snippet: 'Access free, confidential support anytime via phone, WhatsApp, or online.',
-    content: \`## Spectrum.Life (Introduced Oct 2024)
+    content: `## Spectrum.Life (Introduced Oct 2024)
 
 This platform provides 24/7 access to a range of health and wellbeing resources, additional to existing University support.
 
@@ -370,7 +370,7 @@ This platform provides 24/7 access to a range of health and wellbeing resources,
 *   **UK Freephone:** 0800 031 8227
 *   **WhatsApp:** Text 'Hi' to 074 1836 0780
 
-Use this while waiting for uni appointments, outside working hours, or for general wellbeing tips.\`,
+Use this while waiting for uni appointments, outside working hours, or for general wellbeing tips.`,
     keywords: ['spectrum life', '24/7 support', 'helpline', 'counselling', 'wellbeing', 'fitness', 'workshops', 'confidential', 'blog', 'uon']
   },
   {
@@ -378,7 +378,7 @@ Use this while waiting for uni appointments, outside working hours, or for gener
     title: 'The Importance of Self-Care (May 2024)',
     category: 'Mental Health Blog',
     snippet: 'Understanding what self-care is and why it matters for students.',
-    content: \`## Why Self-Care Matters (May 2024 Blog)
+    content: `## Why Self-Care Matters (May 2024 Blog)
 
 Self-care isn't selfish; it's essential for maintaining mental and physical wellbeing, especially during stressful periods like university.
 
@@ -396,7 +396,7 @@ It's any activity we do deliberately to take care of our mental, emotional, and 
 *   Start small - even 5-10 minutes can make a difference.
 *   Be kind to yourself if you miss a day.
 
-**Remember:** Self-care helps prevent burnout and improves your ability to cope with challenges.\`,
+**Remember:** Self-care helps prevent burnout and improves your ability to cope with challenges.`,
     keywords: ['self-care', 'wellbeing', 'mental health', 'burnout', 'stress management', 'relaxation', 'hobbies', 'boundaries', 'blog']
   },
 
@@ -406,7 +406,7 @@ It's any activity we do deliberately to take care of our mental, emotional, and 
     title: 'What Can This Chatbot Do?',
     category: 'Chatbot FAQs',
     snippet: 'Overview of the chatbot\'s functions and limitations.',
-    content: \`## Chatbot Capabilities
+    content: `## Chatbot Capabilities
 
 This chatbot is designed to:
 
@@ -420,7 +420,7 @@ This chatbot is designed to:
 *   **Not a Therapist:** Cannot provide counselling, diagnosis, or treatment.
 *   **Not for Emergencies:** Cannot handle immediate crises (directs to crisis lines).
 *   **Knowledge Limit:** Information is based on the data it was trained on (primarily UON resources provided). It may not have real-time updates or info outside its scope.
-*   **Doesn't Remember:** Conversations are typically stateless unless specific features are built for context memory within a session.\`,
+*   **Doesn't Remember:** Conversations are typically stateless unless specific features are built for context memory within a session.`,
     keywords: ['chatbot', 'capabilities', 'functions', 'limitations', 'faq', 'ai', 'resources', 'support']
   },
   {
@@ -428,7 +428,7 @@ This chatbot is designed to:
     title: 'Is My Conversation Confidential?',
     category: 'Chatbot FAQs',
     snippet: 'Information about the privacy and confidentiality of chatbot interactions.',
-    content: \`## Chatbot Confidentiality & Privacy
+    content: `## Chatbot Confidentiality & Privacy
 
 *   **General Principle:** Chatbot interactions should be treated with a degree of privacy, but are typically not confidential in the same way as talking to a human counsellor.
 *   **Data Usage:** Conversations *may* be logged anonymously for purposes like:
@@ -438,7 +438,7 @@ This chatbot is designed to:
 *   **No Personal Identification:** Logs are usually anonymised, meaning they are not linked to your specific name or student ID unless you explicitly provide such information.
 *   **Crisis Exception:** If you express clear intent to harm yourself or others, safety protocols might involve escalation, though the chatbot itself cannot directly intervene.
 
-**Recommendation:** Avoid sharing highly sensitive personal details (like specific trauma details, names of others involved in personal issues) that you would only share in a confidential therapeutic setting.\`,
+**Recommendation:** Avoid sharing highly sensitive personal details (like specific trauma details, names of others involved in personal issues) that you would only share in a confidential therapeutic setting.`,
     keywords: ['chatbot', 'confidentiality', 'privacy', 'data', 'logging', 'anonymised', 'security', 'faq']
   },
   {
@@ -446,7 +446,7 @@ This chatbot is designed to:
     title: 'Chatbot & Crisis Support Handling',
     category: 'Chatbot FAQs',
     snippet: 'How the chatbot handles mental health crises and where to get urgent help.',
-    content: \`## Chatbot Role in Crisis
+    content: `## Chatbot Role in Crisis
 
 This chatbot can provide information and direct you to resources, but **it cannot provide immediate crisis intervention or counselling.**
 
@@ -461,7 +461,7 @@ This chatbot can provide information and direct you to resources, but **it canno
 *   "I'm having a mental health crisis."
 *   Mentions of suicide or specific self-harm methods.
 
-**Refer to the 'Crisis Support' category for a full list of urgent contacts.**\`,
+**Refer to the 'Crisis Support' category for a full list of urgent contacts.**`,
     keywords: ['chatbot', 'crisis', 'urgent help', 'emergency', 'suicide', 'self-harm', 'support lines', 'faq', 'response']
   },
 ]; 
