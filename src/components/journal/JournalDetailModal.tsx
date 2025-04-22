@@ -52,7 +52,7 @@ const JournalDetailModal: React.FC<JournalDetailModalProps> = ({
       scrollBehavior="inside" // Allows scrolling within the modal body
       backdrop="blur"
     >
-      <ModalContent className="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+      <ModalContent className="bg-gray-900 text-gray-100 shadow-[0_4px_30px_rgba(236,_72,_153,_0.4)]">
         {(close) => (
           <>
             <ModalHeader className="flex flex-col gap-1 border-b border-gray-200 dark:border-gray-700 pb-4">

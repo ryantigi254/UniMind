@@ -5,64 +5,71 @@ import JournalDetailModal from '../components/journal/JournalDetailModal';
 import JournalFormModal from '../components/journal/JournalFormModal';
 // import { createClient } from '@supabase/supabase-js'; // Import Supabase client if needed
 
-// Mock data - replace with actual data fetching later
+// Mock data reflecting common student mental health themes
 const mockJournalEntries: JournalEntry[] = [
   {
     id: '1',
-    title: 'Random, but beautiful, acts of kindness',
-    date: '2024-07-25',
-    snippet: 'Exploring small gestures that make a big difference.',
-    content: `Today felt different. I decided to consciously look for opportunities to perform small, random acts of kindness. It started with holding the door open for someone juggling packages, then paying for the coffee of the person behind me in line.\n\nIt's fascinating how these tiny actions ripple outwards. The smiles, the brief moments of connection – they brightened my day as much as theirs. It reminded me that even on ordinary days, we have the power to create little pockets of beauty and warmth.`,
+    title: 'Feeling Overwhelmed by Deadlines',
+    date: '2024-11-15',
+    imageUrl: '/misc/images/CineDiffusion Image.webp',
+    snippet: 'Trying to manage the stress of multiple assignments due soon...',
+    content: `Feeling the pressure pile up this week. Two essays and a presentation due next Friday. It's hard to know where to start. Tried breaking tasks down like the stress management resources suggest, but my focus keeps drifting. Deep breathing helped a little this morning. Maybe I should try that 7-11 technique mentioned in the blog? Just need to get through this week. Remembering that it's okay to feel stressed, but need to find ways to cope without burning out.`,
   },
   {
     id: '2',
-    title: 'Foods for better gut health',
-    date: '2024-07-24',
-    snippet: 'Learning about the connection between food and gut microbiome.',
-    content: `Dived into some research about gut health today. It's amazing how much our digestive system influences overall well-being, including mood and immunity.\n\n- Started incorporating more fermented foods like kimchi and yogurt.\n- Trying to increase fiber intake with more vegetables and whole grains.\n- Reducing processed sugars feels like a good step too.\n\nIt's a journey, but feeling hopeful about the positive changes.`,
+    title: 'Navigating Social Anxiety at Uni Event',
+    date: '2024-11-12',
+    imageUrl: '/misc/images/CineDiffusion Image 1.webp',
+    snippet: 'Went to the society mixer tonight. It was tough, but I did it.',
+    content: `Pushed myself to go to the mixer tonight. Heart was pounding just walking in. Wanted to turn back, but remembered the advice about small steps. Talked to two new people – mostly small talk, but it's a start. Felt awkward, but also a bit proud for not just staying in my room. Loneliness has been hitting hard lately, so trying to connect is important, even if it feels scary. Maybe the next one will be easier?`,
   },
-    {
+  {
     id: '3',
-    title: 'Make someone feel special',
-    date: '2024-07-23',
-    snippet: 'The simple power of genuine appreciation.',
-    content: `Focused on making someone feel genuinely appreciated today. I sent a heartfelt thank-you note to a colleague who went above and beyond on a recent project. Their surprised and happy reaction was incredibly rewarding.\n\nIt takes so little effort to acknowledge the good in others, yet it can mean so much. A reminder to myself to practice this more often.`,
+    title: 'First Drop-In Session Experience',
+    date: '2024-11-10',
+    imageUrl: '/misc/images/CineDiffusion Image 2.webp',
+    snippet: 'Booked a drop-in with the Counselling & Mental Health team today.',
+    content: `Finally booked one of those drop-in sessions. Was really nervous beforehand, wasn't sure what to expect or if my problems were 'valid' enough. The person I spoke to was really understanding, didn't feel judged at all. Just talking about feeling low and unmotivated for 20 minutes actually helped lift some weight. They signposted me to some self-help resources on the Student Hub too. Might try the longer counselling sessions if things don't improve.`,
   },
   {
     id: '4',
-    title: 'Get philosophical',
-    date: '2024-07-22',
-    snippet: 'Contemplating the big questions and finding peace in the unknown.',
-    content: `Spent the evening pondering some of life's bigger questions. What is purpose? What defines happiness?\n\nThere aren't always easy answers, and maybe that's the point. Embracing the questions, the uncertainty, and the journey of discovery itself can be a source of profound peace and growth. It's okay not to have it all figured out.`,
+    title: 'Struggling with Homesickness',
+    date: '2024-11-05',
+    imageUrl: '/misc/images/CineDiffusion Image 3.webp',
+    snippet: 'Missing home and family a lot this week.',
+    content: `It hit me hard this week, especially seeing friends back home posting pictures together. Feeling really disconnected here sometimes. It helps talking to family on video calls, but it's not the same. The ISSS info mentioned culture shock and how it's normal. Trying to remind myself of that. Maybe I should check out that international student society meeting next week? Need to find ways to build a sense of community here.`,
   },
-  // Add more mock entries based on the images provided if needed
   {
     id: '5',
-    title: 'Learn about something new',
-    date: '2024-07-21',
-    snippet: 'Expanding horizons, one new fact at a time.',
-    content: `Took some time today to learn about astrophysics – specifically, black holes. It's mind-bending stuff! While I barely scratched the surface, the sheer scale and mystery of the universe are awe-inspiring.\n\nIt felt good to stretch my brain in a completely new direction. A good reminder that there's always more to learn and discover, no matter how small the topic.`,
+    title: 'Mindfulness Practice - Trying the Chocolate Meditation',
+    date: '2024-11-02',
+    imageUrl: '/misc/images/CineDiffusion Image 4.webp',
+    snippet: 'Tried that mindful chocolate eating exercise from the Counsellors\' Corner...',
+    content: `Decided to try the chocolate meditation mentioned online. Seemed a bit silly at first, just focusing on a piece of chocolate. But it was actually quite grounding. Forced me to slow down and just notice the sensations instead of letting my mind race about assignments or worries. Didn't magically fix anything, but it was a nice 5-minute pause. Maybe I can incorporate small mindful moments like this more often.`,
   },
-   {
+  {
     id: '6',
-    title: 'Tell me about...',
-    date: '2024-07-20',
-    snippet: 'The power of asking questions and active listening.',
-    content: `Practiced active listening today. Instead of waiting for my turn to talk, I focused on truly understanding what others were saying, asking clarifying questions like "Tell me more about that...".\n\nIt led to much richer conversations and deeper connections. It's amazing what you can learn when you simply stop and listen.`,
+    title: 'Worrying About Exam Results',
+    date: '2024-10-28',
+    imageUrl: '/misc/images/CineDiffusion Image 5.webp',
+    snippet: 'Can't stop thinking about the results coming out next week.',
+    content: `The wait for exam results is agonising. Keep replaying the questions in my head, worrying I messed up. It's hard to concentrate on this term's work. Tried distracting myself, went for a run like the mental health awareness week stuff suggested, which helped temporarily. Need to accept I've done all I can now and stressing won't change the outcome. Easier said than done!`,
   },
-    {
+  {
     id: '7',
-    title: 'Health and wellness trends of 2024',
-    date: '2024-07-19',
-    snippet: `Exploring what's new in the world of well-being.`,
-    content: `Read an article summarizing the top health and wellness trends for this year. Some interesting points about personalized nutrition, mental fitness apps, and the growing importance of sleep hygiene.\n\nWhile trends come and go, the underlying theme seems to be a more holistic and individualized approach to health. It's less about quick fixes and more about sustainable lifestyle changes.`,
+    title: 'Finding Balance - Avoiding Burnout',
+    date: '2024-10-22',
+    imageUrl: '/misc/images/CineDiffusion Image 6.webp',
+    snippet: 'Realised I haven't taken a proper break in weeks. Need to prioritise self-care.',
+    content: `Felt completely drained today. Looked back at my calendar and realised it's been non-stop study and work. No wonder I feel like I'm running on empty. Read something about scheduling breaks like appointments. Going to try blocking out time for a walk tomorrow and maybe just reading a book for fun, not for the course. Need to find a better balance before I crash.`,
   },
   {
     id: '8',
-    title: 'Perfect your sleeping environment',
-    date: '2024-07-18',
-    snippet: 'Creating a sanctuary for restful nights.',
-    content: `Decided to optimize my bedroom for better sleep. Key changes:\n\n- Installed blackout curtains to block out morning light.\n- Set a cooler room temperature.\n- Removed electronics from the nightstand (phone charges across the room now).\n- Trying a calming lavender pillow spray.\n\nHoping these adjustments lead to more restorative sleep!`,
+    title: 'Imposter Syndrome Creeping In',
+    date: '2024-10-18',
+    imageUrl: '/misc/images/CineDiffusion Image 7.webp',
+    snippet: 'Feeling like I don't belong here or deserve my place.',
+    content: `Had a supervision meeting today and felt like a complete fraud. Everyone else seems to know exactly what they're doing. That voice in my head keeps saying I'm not smart enough and I'll be found out soon. It's exhausting. Remembered reading about imposter syndrome on Student Minds. Knowing it's a common thing helps a tiny bit. Need to focus on my actual progress, not just my fears.`,
   },
 ];
 
@@ -209,7 +216,7 @@ const JournalPage: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 h-full overflow-y-auto">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">My Journal</h1>
         <Button color="primary" onPress={handleCreate} startIcon={<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5"><path d="M10.75 4.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z" /></svg>}>
