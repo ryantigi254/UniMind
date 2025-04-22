@@ -11,13 +11,13 @@ type ResourceDetailModalProps = {
 const ResourceDetailModal: React.FC<ResourceDetailModalProps> = ({ resource, onClose }) => {
   return (
     <div 
-      className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
       onClick={onClose} // Close on backdrop click
     >
       <div 
-        className="bg-gray-900 rounded-xl shadow-2xl p-8 max-w-3xl w-full max-h-[90vh] overflow-y-auto relative text-gray-300 border border-gray-700 shadow-pink-500/30"
+        className="bg-gray-900 rounded-xl shadow-2xl p-8 max-w-3xl w-full max-h-[90vh] overflow-y-auto relative text-gray-300 border border-gray-700"
         onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside modal
-        style={{ boxShadow: '0 0 25px 5px rgba(236, 72, 153, 0.4)' }} // Pink underglow
+        style={{ boxShadow: '0 0 20px 3px rgba(236, 72, 153, 0.25)' }} // Pink underglow - Reduced intensity (blur, spread, opacity)
       >
         <button 
           onClick={onClose}
