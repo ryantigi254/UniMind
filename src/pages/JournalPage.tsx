@@ -11,16 +11,13 @@ const mockJournalEntries: JournalEntry[] = [
     id: '1',
     title: 'Random, but beautiful, acts of kindness',
     date: '2024-07-25',
-    imageUrl: '/placeholder-images/journal-kindness.jpg',
     snippet: 'Exploring small gestures that make a big difference.',
-    // Using plain text content for safety in <pre>
     content: `Today felt different. I decided to consciously look for opportunities to perform small, random acts of kindness. It started with holding the door open for someone juggling packages, then paying for the coffee of the person behind me in line.\n\nIt's fascinating how these tiny actions ripple outwards. The smiles, the brief moments of connection – they brightened my day as much as theirs. It reminded me that even on ordinary days, we have the power to create little pockets of beauty and warmth.`,
   },
   {
     id: '2',
     title: 'Foods for better gut health',
     date: '2024-07-24',
-    imageUrl: '/placeholder-images/journal-gut-health.jpg',
     snippet: 'Learning about the connection between food and gut microbiome.',
     content: `Dived into some research about gut health today. It's amazing how much our digestive system influences overall well-being, including mood and immunity.\n\n- Started incorporating more fermented foods like kimchi and yogurt.\n- Trying to increase fiber intake with more vegetables and whole grains.\n- Reducing processed sugars feels like a good step too.\n\nIt's a journey, but feeling hopeful about the positive changes.`,
   },
@@ -28,7 +25,6 @@ const mockJournalEntries: JournalEntry[] = [
     id: '3',
     title: 'Make someone feel special',
     date: '2024-07-23',
-    imageUrl: '/placeholder-images/journal-special.jpg', // Make sure these paths exist or use URLs
     snippet: 'The simple power of genuine appreciation.',
     content: `Focused on making someone feel genuinely appreciated today. I sent a heartfelt thank-you note to a colleague who went above and beyond on a recent project. Their surprised and happy reaction was incredibly rewarding.\n\nIt takes so little effort to acknowledge the good in others, yet it can mean so much. A reminder to myself to practice this more often.`,
   },
@@ -36,7 +32,6 @@ const mockJournalEntries: JournalEntry[] = [
     id: '4',
     title: 'Get philosophical',
     date: '2024-07-22',
-    imageUrl: '/placeholder-images/journal-philosophical.jpg', // Make sure these paths exist or use URLs
     snippet: 'Contemplating the big questions and finding peace in the unknown.',
     content: `Spent the evening pondering some of life's bigger questions. What is purpose? What defines happiness?\n\nThere aren't always easy answers, and maybe that's the point. Embracing the questions, the uncertainty, and the journey of discovery itself can be a source of profound peace and growth. It's okay not to have it all figured out.`,
   },
@@ -45,7 +40,6 @@ const mockJournalEntries: JournalEntry[] = [
     id: '5',
     title: 'Learn about something new',
     date: '2024-07-21',
-    imageUrl: '/placeholder-images/journal-learn.jpg', // Make sure these paths exist or use URLs
     snippet: 'Expanding horizons, one new fact at a time.',
     content: `Took some time today to learn about astrophysics – specifically, black holes. It's mind-bending stuff! While I barely scratched the surface, the sheer scale and mystery of the universe are awe-inspiring.\n\nIt felt good to stretch my brain in a completely new direction. A good reminder that there's always more to learn and discover, no matter how small the topic.`,
   },
@@ -53,7 +47,6 @@ const mockJournalEntries: JournalEntry[] = [
     id: '6',
     title: 'Tell me about...',
     date: '2024-07-20',
-    imageUrl: '/placeholder-images/journal-tell-me.jpg', // Make sure these paths exist or use URLs
     snippet: 'The power of asking questions and active listening.',
     content: `Practiced active listening today. Instead of waiting for my turn to talk, I focused on truly understanding what others were saying, asking clarifying questions like "Tell me more about that...".\n\nIt led to much richer conversations and deeper connections. It's amazing what you can learn when you simply stop and listen.`,
   },
@@ -61,15 +54,13 @@ const mockJournalEntries: JournalEntry[] = [
     id: '7',
     title: 'Health and wellness trends of 2024',
     date: '2024-07-19',
-    imageUrl: '/placeholder-images/journal-trends.jpg', // Make sure these paths exist or use URLs
-    snippet: 'Exploring what's new in the world of well-being.',
+    snippet: `Exploring what's new in the world of well-being.`,
     content: `Read an article summarizing the top health and wellness trends for this year. Some interesting points about personalized nutrition, mental fitness apps, and the growing importance of sleep hygiene.\n\nWhile trends come and go, the underlying theme seems to be a more holistic and individualized approach to health. It's less about quick fixes and more about sustainable lifestyle changes.`,
   },
   {
     id: '8',
     title: 'Perfect your sleeping environment',
     date: '2024-07-18',
-    imageUrl: '/placeholder-images/journal-sleep.jpg', // Make sure these paths exist or use URLs
     snippet: 'Creating a sanctuary for restful nights.',
     content: `Decided to optimize my bedroom for better sleep. Key changes:\n\n- Installed blackout curtains to block out morning light.\n- Set a cooler room temperature.\n- Removed electronics from the nightstand (phone charges across the room now).\n- Trying a calming lavender pillow spray.\n\nHoping these adjustments lead to more restorative sleep!`,
   },
