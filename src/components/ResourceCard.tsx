@@ -1,13 +1,26 @@
 import React from 'react';
 import { ResourceEntry } from '../types/resources';
 import {
-  BookOpen, // Default / Blog / Corner
-  HelpCircle, // FAQs
-  LifeBuoy, // Crisis Support
-  Sparkles, // Self-Help
-  GraduationCap, // Uni Events
-  MessageSquare, // Chatbot FAQs
-  ArrowRight, // Hover arrow
+  // General & Default
+  BookOpen, Info, HelpCircle, MessageSquare, Sparkles, ArrowRight, UserCheck, Edit, FileText, MessageCircle, List,
+  // Specific Topics
+  HeartPulse, // Anxiety, Panic
+  Brain, // CBT, Mental Health, Understanding
+  Moon, // Sleep
+  Cloudy, // Low Mood, Depression
+  UserMinus, // Loneliness
+  Users, // Social, Relationships
+  LifeBuoy, // Crisis
+  Phone, // Contact, Helpline
+  GraduationCap, // Uni, Academic
+  Calendar, // Events
+  ClipboardCheck, // Eligibility, Registration
+  Clock, // Session Duration, Time Management
+  DollarSign, // Cost, Free
+  Search, // Find, Discover
+  Zap, // Stress
+  Smile, // Wellbeing, Positivity
+  // ... add more as needed based on resource IDs
 } from 'lucide-react';
 
 type ResourceCardProps = {
@@ -15,27 +28,59 @@ type ResourceCardProps = {
   onClick: () => void;
 };
 
-// Function to get the appropriate icon based on category
-const getIconForCategory = (category: string): React.ElementType => {
-  switch (category) {
-    case 'Counselling FAQs':
-    case 'Chatbot FAQs':
-      return HelpCircle;
-    case 'Self-Help':
-      return Sparkles;
-    case 'Crisis Support':
-      return LifeBuoy;
-    case 'Uni Events & Resources':
-      return GraduationCap;
-    case 'Mental Health Blog':
-    case 'Counsellors Corner':
+// Function to get the appropriate icon based on resource ID
+const getIconForResource = (resourceId: string): React.ElementType => {
+  switch (resourceId) {
+    // Counselling FAQs
+    case 'faq-counselling-what-is': return Brain; // Understanding the concept
+    case 'faq-counselling-eligibility': return ClipboardCheck; // Checklist, criteria
+    case 'faq-counselling-what-to-expect': return Clock; // Session process/duration
+    case 'faq-counselling-how-to-register': return Edit; // Form, sign up
+    case 'faq-counselling-types': return List; // Different options
+
+    // Self-Help
+    case 'selfhelp-anxiety-panic': return HeartPulse; // Physical symptoms
+    case 'selfhelp-low-mood-depression': return Cloudy; // Feeling down
+    case 'selfhelp-sleep': return Moon;
+    case 'selfhelp-stress': return Zap; // Feeling overwhelmed
+
+    // Crisis Support
+    case 'crisis-support-immediate-help': return LifeBuoy;
+
+    // Counsellors Corner
+    case 'counsellor-corner-loneliness': return UserMinus;
+    case 'counsellor-corner-exam-stress': return GraduationCap; // Relates to exams
+    case 'counsellor-corner-social-media': return Users; // Social aspect
+    case 'counsellor-corner-procrastination': return Clock; // Time aspect
+
+    // Uni Events & Resources
+    case 'uni-resource-wellbeing-events': return Calendar;
+    case 'uni-resource-academic-support': return GraduationCap;
+    case 'uni-resource-financial-advice': return DollarSign; // Money related
+    case 'uni-resource-disability-support': return UserCheck; // Specific support
+
+    // Mental Health Blog
+    case 'blog-mindfulness-intro': return Brain; // Mental technique
+    case 'blog-positive-affirmations': return Smile;
+    case 'blog-managing-burnout': return Zap; // Similar to stress
+    case 'blog-building-resilience': return Sparkles; // Strength, growth
+
+    // Chatbot FAQs
+    case 'faq-chatbot-how-it-works': return MessageCircle;
+    case 'faq-chatbot-privacy': return HelpCircle; // More general question
+    case 'faq-chatbot-limitations': return Info; // Information symbol
+    case 'faq-chatbot-personalization': return Edit; // Settings, customization
+
+    // Default
     default:
-      return BookOpen;
+      return BookOpen; // General resource/info
   }
 };
 
+
 const ResourceCard: React.FC<ResourceCardProps> = ({ resource, onClick }) => {
-  const CategoryIcon = getIconForCategory(resource.category);
+  // Use the new function to get the icon based on resource ID
+  const ResourceIcon = getIconForResource(resource.id);
 
   return (
     <button
@@ -44,7 +89,8 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource, onClick }) => {
     >
       {/* Icon in top-left */}
       <div className="absolute top-4 left-4">
-        <CategoryIcon className="w-6 h-6 text-pink-500" />
+        {/* Render the specific resource icon */}
+        <ResourceIcon className="w-6 h-6 text-pink-500" />
       </div>
 
       {/* Content - Added padding-left to avoid overlap with icon */}
