@@ -27,7 +27,7 @@ const ResourceDetailModal: React.FC<ResourceDetailModalProps> = ({ resource, onC
           <X className="h-6 w-6" />
         </button>
         <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6 sm:mb-8">{resource.title}</h2>
-        <div className="prose prose-invert prose-sm sm:prose-base max-w-none prose-a:text-blue-400 hover:prose-a:text-blue-300 hover:prose-a:underline prose-headings:font-semibold prose-strong:text-white">
+        <div className="prose prose-invert prose-sm sm:prose-base max-w-none prose-a:text-blue-400 hover:prose-a:text-blue-300 hover:prose-a:underline prose-headings:font-semibold prose-headings:mb-4 prose-p:my-4 prose-li:my-2 prose-strong:text-white">
           <ReactMarkdown>{resource.content}</ReactMarkdown>
         </div>
       </div>
