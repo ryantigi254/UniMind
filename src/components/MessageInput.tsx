@@ -4,9 +4,14 @@ import { Plus, Mic, Send } from 'lucide-react';
 interface MessageInputProps {
   onSendMessage: (message: string) => void;
   isLoading?: boolean;
+  placeholder?: string;
 }
 
-const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage, isLoading }) => {
+const MessageInput: React.FC<MessageInputProps> = ({ 
+  onSendMessage, 
+  isLoading,
+  placeholder = "Ask anything"
+}) => {
   const [message, setMessage] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -65,7 +70,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage, isLoading })
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Ask anything"
+            placeholder={placeholder}
             disabled={isLoading}
             className="
               flex-1 bg-transparent resize-none

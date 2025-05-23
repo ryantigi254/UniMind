@@ -25,3 +25,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Page specific production files
+src/pages/AuthPage.prod.tsx

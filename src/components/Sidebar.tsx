@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MessageSquare, BarChart2, Book, Mic, History, BookOpen } from 'lucide-react';
+import { MessageSquare, BarChart2, Book, Mic, History, BookOpen, Plus } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useStore } from '../store';
 import { Chat } from '../types';
@@ -80,7 +80,8 @@ const Sidebar: React.FC = () => {
     currentChat,
     setCurrentChat,
     renameChat,
-    deleteChat
+    deleteChat,
+    createNewChat
   } = useStore();
 
   const [contextMenu, setContextMenu] = useState<{
@@ -143,6 +144,12 @@ const Sidebar: React.FC = () => {
     }
   };
 
+  const handleNewChat = () => {
+    const newChat = createNewChat('New Therapy Session', true);
+    setCurrentChat(newChat);
+    navigate('/');
+  };
+
   return (
     <div 
       className="h-full flex flex-col bg-gray-900"
@@ -183,7 +190,54 @@ const Sidebar: React.FC = () => {
           ))}
         </ul>
 
+        {/* New Chat Button */}
         {isSidebarCollapsed ? (
+          <div className="mt-6">
+            <button
+              onClick={handleNewChat}
+              className="w-full flex justify-center p-3 text-gray-300 hover:bg-gray-800 rounded-lg transition-colors"
+              title="New Chat"
+            >
+              <Plus className="h-5 w-5" />
+            </button>
+          </div>
+        ) : (
+          <div className="mt-6">
+            <button
+              onClick={handleNewChat}
+              className="w-full flex items-center gap-3 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              <Plus className="h-5 w-5" />
+              <span className="font-medium">New Chat</span>
+            </button>
+          </div>
+        )}
+
+        {/* Recent Chats Section */}
+        {!isSidebarCollapsed && (
+          <div className="mt-6 pt-6 border-t border-gray-800">
+            <h2 className="px-4 text-sm font-medium text-gray-400 mb-2">Recent Chats</h2>
+            <div className="space-y-1 max-h-[calc(100vh-400px)] overflow-y-auto">
+              {chats.length === 0 ? (
+                <div className="px-4 py-2 text-sm text-gray-400">
+                  No chats yet. Start a new conversation!
+                </div>
+              ) : (
+                chats.map((chat) => (
+                  <ChatItem
+                    key={chat.id}
+                    chat={chat}
+                    isActive={currentChat?.id === chat.id}
+                    onClick={() => handleChatSelect(chat)}
+                    onContextMenu={(e) => handleContextMenu(e, chat.id)}
+                  />
+                ))
+              )}
+            </div>
+          </div>
+        )}
+
+        {isSidebarCollapsed && chats.length > 0 && (
           <div className="mt-6 pt-6 border-t border-gray-800">
             <button
               onClick={handleExpandAndLoadRecent}
@@ -193,22 +247,6 @@ const Sidebar: React.FC = () => {
               <History className="h-5 w-5" />
             </button>
           </div>
-        ) : (
-          chats.length > 0 && (
-            <div className="mt-6 pt-6 border-t border-gray-800">
-              <div className="space-y-1 max-h-[calc(100vh-400px)] overflow-y-auto">
-                {chats.map((chat) => (
-                  <ChatItem
-                    key={chat.id}
-                    chat={chat}
-                    isActive={currentChat?.id === chat.id}
-                    onClick={() => handleChatSelect(chat)}
-                    onContextMenu={(e) => handleContextMenu(e, chat.id)}
-                  />
-                ))}
-              </div>
-            </div>
-          )
         )}
       </nav>
 

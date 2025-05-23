@@ -4,18 +4,12 @@
 
 @layer base {
   body {
-    @apply antialiased;
+    @apply antialiased bg-background-light dark:bg-background-dark text-gray-900 dark:text-white transition-colors duration-200;
   }
 
   /* Set heading colors for dark mode */
-  .dark h1,
-  .dark h2,
-  .dark h3,
-  .dark h4,
-  .dark h5,
-  .dark h6,
-  .dark .section-title {
-    @apply text-white;
+  h1, h2, h3, h4, h5, h6, .section-title {
+    @apply text-gray-900 dark:text-white;
   }
 }
 
@@ -33,9 +27,23 @@
 }
 
 .auth-input {
-  @apply w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent !important;
+  @apply w-full px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent !important;
 }
 
 .auth-label {
-  @apply block text-sm font-medium text-gray-300 mb-1 !important;
+  @apply block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 !important;
+}
+
+/* Card styles */
+.card {
+  @apply bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700;
+}
+
+/* Button styles */
+.btn-primary {
+  @apply bg-primary-500 hover:bg-primary-600 text-white rounded-lg transition-colors;
+}
+
+.btn-secondary {
+  @apply bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-white rounded-lg transition-colors;
 }

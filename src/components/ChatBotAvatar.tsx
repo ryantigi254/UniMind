@@ -1,39 +1,58 @@
-import React, { memo } from 'react';
+// components/ChatBotAvatar.tsx
+import React from 'react';
 
 interface ChatBotAvatarProps {
   size?: number;
   className?: string;
 }
 
-const ChatBotAvatar: React.FC<ChatBotAvatarProps> = memo(({ 
-  size = 32,
-  className = ''
+const ChatBotAvatar: React.FC<ChatBotAvatarProps> = ({ 
+  size = 40, 
+  className = "" 
 }) => {
   return (
-    <div
-      className={`relative flex items-center justify-center rounded-full bg-black ${className}`}
+    <div 
+      className={`
+        flex-shrink-0 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 
+        flex items-center justify-center shadow-md
+        ${className}
+      `}
       style={{ width: size, height: size }}
-      role="img"
-      aria-label="UniMind AI Assistant"
     >
       <svg
-        width={size * 0.85}
-        height={size * 0.85}
+        width={size * 0.6}
+        height={size * 0.6}
+        xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 100 100"
-        className="text-primary-500"
+        className="text-white"
         aria-hidden="true"
       >
+        {/* Robot head */}
         <rect width="60" height="45" x="20" y="35" rx="10" ry="10" fill="currentColor"/>
-        <circle cx="38" cy="53" r="5" fill="#000000" />
-        <circle cx="62" cy="53" r="5" fill="#000000" />
-        <path d="M45 62 Q50 67 55 62" stroke="#4A5568" strokeWidth="3" fill="none" strokeLinecap="round"/>
-        <line x1="50" y1="25" x2="50" y2="35" stroke="currentColor" strokeWidth="3"/>
-        <circle cx="50" cy="22" r="3" fill="currentColor"/>
+        
+        {/* Eyes */}
+        <circle cx="35" cy="50" r="4" fill="#1f2937" />
+        <circle cx="65" cy="50" r="4" fill="#1f2937" />
+        
+        {/* Mouth */}
+        <path 
+          d="M40 65 Q50 70 60 65" 
+          stroke="#1f2937" 
+          strokeWidth="2" 
+          fill="none" 
+          strokeLinecap="round"
+        />
+        
+        {/* Antenna */}
+        <line x1="50" y1="25" x2="50" y2="35" stroke="currentColor" strokeWidth="2"/>
+        <circle cx="50" cy="22" r="2" fill="currentColor"/>
+        
+        {/* Small indicator dots */}
+        <circle cx="30" cy="42" r="1" fill="#10b981" />
+        <circle cx="70" cy="42" r="1" fill="#ef4444" />
       </svg>
     </div>
   );
-});
-
-ChatBotAvatar.displayName = 'ChatBotAvatar';
+};
 
 export default ChatBotAvatar;

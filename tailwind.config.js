@@ -12,17 +12,28 @@ export default {
     extend: {
       colors: {
         primary: {
-          DEFAULT: '#FF007A',
-          50: '#FFF0F7',
-          100: '#FFE1EF',
-          200: '#FFC3DF',
-          300: '#FFA6CF',
-          400: '#FF88BF',
-          500: '#FF007A',
-          600: '#CC0062',
-          700: '#99004A',
-          800: '#660031',
-          900: '#330019'
+          50: '#fff1f6',
+          100: '#ffe4f0',
+          200: '#ffc9e1',
+          300: '#ff9ec9',
+          400: '#ff63a8',
+          500: '#ff007a', // Main pink accent
+          600: '#e6006e',
+          700: '#cc005f',
+          800: '#a3004c',
+          900: '#80003a',
+        },
+        background: {
+          light: '#fdf6f0', // Cream background for light mode
+          dark: '#1a1b2e', // Navy blue background for dark mode
+        },
+        sidebar: {
+          light: '#ffffff',
+          dark: '#1a1b2e',
+        },
+        content: {
+          light: '#ffffff',
+          dark: '#1a1b2e',
         },
         secondary: {
           DEFAULT: '#4FD1C5',

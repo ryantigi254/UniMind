@@ -1,169 +1,177 @@
+// store/index.ts
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
-import { Chat, Message, MoodEntry, JournalEntry, UserSettings, DisclaimerStatus } from '../types';
-import { User, Session } from '@supabase/supabase-js';
+import { persist } from 'zustand/middleware';
+import { Chat, Message, Settings, StoreState } from '../types';
+import { therapyAPI } from '../services/llmService';
 
-interface State {
-  user: User | null;
-  session: Session | null;
-  chats: Chat[];
-  currentChat: Chat | null;
-  moodEntries: MoodEntry[];
-  journalEntries: JournalEntry[];
-  settings: UserSettings;
-  disclaimerStatus: DisclaimerStatus;
-  isSidebarOpen: boolean;
-  isSidebarCollapsed: boolean;
-  isLoading: boolean;
-  error: string | null;
-}
-
-interface Actions {
-  setUser: (user: User | null) => void;
-  setSession: (session: Session | null) => void;
-  setCurrentChat: (chat: Chat | null) => void;
+interface StoreStateWithActions extends StoreState {
+  // Chat management
   addChat: (chat: Chat) => void;
-  renameChat: (chatId: string, newTitle: string) => void;
-  deleteChat: (chatId: string) => void;
-  addMessage: (chatId: string, message: Message) => void;
-  addMoodEntry: (entry: MoodEntry) => void;
-  addJournalEntry: (entry: JournalEntry) => void;
-  updateSettings: (settings: Partial<UserSettings>) => void;
-  setDisclaimerAccepted: (accepted: boolean) => void;
-  toggleSidebar: () => void;
-  toggleSidebarCollapse: () => void;
-  setError: (error: string | null) => void;
-  clearAllData: () => void;
+  updateChat: (chatId: string, updates: Partial<Chat>) => void;
+  loadChats: () => void;
+  saveChats: () => void;
 }
 
-const initialSettings: UserSettings = {
-  theme: 'system',
-  chatbotTone: 'friendly',
-  memoryEnabled: true,
-  accessibility: {
-    fontSize: 'normal',
-    highContrast: false,
-  },
-};
-
-export const useStore = create<State & Actions>()(
+export const useStore = create<StoreStateWithActions>()(
   persist(
     (set, get) => ({
-      user: null,
-      session: null,
-      chats: [],
-      currentChat: null,
-      moodEntries: [],
-      journalEntries: [],
-      settings: initialSettings,
-      disclaimerStatus: { accepted: false },
-      isSidebarOpen: true,
+      // Sidebar state
       isSidebarCollapsed: false,
-      isLoading: false,
-      error: null,
-
-      setUser: (user) => set({ user }),
-      setSession: (session) => set({ session }),
-      
-      setCurrentChat: (chat) => set({ currentChat: chat }),
-      
-      addChat: (chat) =>
-        set((state) => ({
-          chats: [chat, ...state.chats],
-          currentChat: chat,
-        })),
-
-      renameChat: (chatId, newTitle) =>
-        set((state) => ({
-          chats: state.chats.map((chat) =>
-            chat.id === chatId
-              ? { ...chat, title: newTitle }
-              : chat
-          ),
-          currentChat: state.currentChat?.id === chatId
-            ? { ...state.currentChat, title: newTitle }
-            : state.currentChat,
-        })),
-
-      deleteChat: (chatId) =>
-        set((state) => {
-          const newChats = state.chats.filter((chat) => chat.id !== chatId);
-          return {
-            chats: newChats,
-            currentChat: state.currentChat?.id === chatId
-              ? newChats[0] || null
-              : state.currentChat,
-          };
-        }),
-
-      addMessage: (chatId, message) =>
-        set((state) => ({
-          chats: state.chats.map((chat) =>
-            chat.id === chatId
-              ? { 
-                  ...chat, 
-                  messages: [...chat.messages, message],
-                  updatedAt: new Date(),
-                }
-              : chat
-          ),
-          currentChat: state.currentChat?.id === chatId
-            ? {
-                ...state.currentChat,
-                messages: [...state.currentChat.messages, message],
-                updatedAt: new Date(),
-              }
-            : state.currentChat,
-        })),
-
-      addMoodEntry: (entry) =>
-        set((state) => ({
-          moodEntries: [...state.moodEntries, entry],
-        })),
-
-      addJournalEntry: (entry) =>
-        set((state) => ({
-          journalEntries: [...state.journalEntries, entry],
-        })),
-
-      updateSettings: (newSettings) =>
-        set((state) => ({
-          settings: { ...state.settings, ...newSettings },
-        })),
-
-      setDisclaimerAccepted: (accepted) =>
-        set((state) => ({
-          disclaimerStatus: {
-            accepted,
-            acceptedAt: accepted ? new Date() : undefined,
-          },
-        })),
-
-      toggleSidebar: () =>
-        set((state) => ({ isSidebarOpen: !state.isSidebarOpen })),
-
       toggleSidebarCollapse: () =>
         set((state) => ({ isSidebarCollapsed: !state.isSidebarCollapsed })),
 
-      setError: (error) => set({ error }),
+      // Chat state
+      chats: [],
+      currentChat: null,
 
-      clearAllData: () =>
-        set({
-          chats: [],
-          moodEntries: [],
-          journalEntries: [],
-          currentChat: null,
-        }),
+      // Settings
+      settings: {
+        darkMode: true,
+        notifications: true,
+        apiEndpoint: import.meta.env.VITE_API_URL || 'http://localhost:8000',
+      },
+
+      // Actions
+      setCurrentChat: (chat: Chat | null) => {
+        set({ currentChat: chat });
+        
+        // Reset therapy session if switching to a different chat
+        if (!chat || !chat.sessionId) {
+          therapyAPI.resetSession();
+        }
+      },
+
+      createNewChat: (title?: string, isTherapySession: boolean = true) => {
+        const newChat: Chat = {
+          id: crypto.randomUUID(),
+          title: title || 'New Conversation',
+          messages: [],
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          isTherapySession,
+        };
+
+        set((state) => ({
+          chats: [newChat, ...state.chats],
+          currentChat: newChat,
+        }));
+
+        // Reset therapy session for new chat
+        therapyAPI.resetSession();
+
+        return newChat;
+      },
+
+      addMessage: (chatId: string, message: Message) => {
+        set((state) => {
+          const updatedChats = state.chats.map((chat) => {
+            if (chat.id === chatId) {
+              const updatedMessages = [...chat.messages, message];
+              
+              // Update chat title if it's the first user message
+              let updatedTitle = chat.title;
+              if (updatedMessages.length === 1 && message.role === 'user') {
+                updatedTitle = message.content.slice(0, 50) + (message.content.length > 50 ? '...' : '');
+              }
+
+              // Update session ID if available in message metadata
+              let updatedSessionId = chat.sessionId;
+              if (message.metadata?.sessionId) {
+                updatedSessionId = message.metadata.sessionId;
+              }
+
+              const updatedChat = {
+                ...chat,
+                title: updatedTitle,
+                messages: updatedMessages,
+                updatedAt: new Date(),
+                sessionId: updatedSessionId,
+              };
+
+              // Update current chat if it's the same one
+              if (state.currentChat?.id === chatId) {
+                set({ currentChat: updatedChat });
+              }
+
+              return updatedChat;
+            }
+            return chat;
+          });
+
+          return { chats: updatedChats };
+        });
+      },
+
+      addChat: (chat: Chat) => {
+        set((state) => ({
+          chats: [chat, ...state.chats],
+        }));
+      },
+
+      updateChat: (chatId: string, updates: Partial<Chat>) => {
+        set((state) => {
+          const updatedChats = state.chats.map((chat) =>
+            chat.id === chatId ? { ...chat, ...updates, updatedAt: new Date() } : chat
+          );
+
+          // Update current chat if it's the same one
+          const updatedCurrentChat = state.currentChat?.id === chatId
+            ? { ...state.currentChat, ...updates, updatedAt: new Date() }
+            : state.currentChat;
+
+          return {
+            chats: updatedChats,
+            currentChat: updatedCurrentChat,
+          };
+        });
+      },
+
+      renameChat: (chatId: string, newTitle: string) => {
+        get().updateChat(chatId, { title: newTitle });
+      },
+
+      deleteChat: (chatId: string) => {
+        set((state) => {
+          const updatedChats = state.chats.filter((chat) => chat.id !== chatId);
+          
+          // Reset current chat if the deleted chat was current
+          const updatedCurrentChat = state.currentChat?.id === chatId ? null : state.currentChat;
+          
+          // Reset therapy session if deleting current chat
+          if (state.currentChat?.id === chatId) {
+            therapyAPI.resetSession();
+          }
+
+          return {
+            chats: updatedChats,
+            currentChat: updatedCurrentChat,
+          };
+        });
+      },
+
+      updateSettings: (newSettings: Partial<Settings>) => {
+        set((state) => ({
+          settings: { ...state.settings, ...newSettings },
+        }));
+      },
+
+      loadChats: () => {
+        // This is handled by the persist middleware
+        console.log('Chats loaded from localStorage');
+      },
+
+      saveChats: () => {
+        // This is handled by the persist middleware
+        console.log('Chats saved to localStorage');
+      },
     }),
     {
-      name: 'unimind-storage',
-      storage: createJSONStorage(() => localStorage),
+      name: 'unimind-store',
       partialize: (state) => ({
-        settings: state.settings,
-        disclaimerStatus: state.disclaimerStatus,
-        isSidebarCollapsed: state.isSidebarCollapsed,
         chats: state.chats,
-        isSidebarOpen: state.isSidebarOpen,
+        currentChat: state.currentChat,
+        settings: state.settings,
+        isSidebarCollapsed: state.isSidebarCollapsed,
       }),
     }
   )

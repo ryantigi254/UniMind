@@ -1,8 +1,15 @@
+// types/index.ts
 export interface Message {
   id: string;
   role: 'user' | 'assistant' | 'systemError';
   content: string;
   timestamp: Date;
+  metadata?: {
+    sessionId?: string;
+    interactionCount?: number;
+    stage?: string;
+    apiSource?: string;
+  };
 }
 
 export interface Chat {
@@ -11,34 +18,53 @@ export interface Chat {
   messages: Message[];
   createdAt: Date;
   updatedAt: Date;
+  sessionId?: string; // For therapy system integration
+  isTherapySession?: boolean; // Flag to identify therapy chats
 }
 
-export interface MoodEntry {
+export interface User {
   id: string;
-  mood: number;
-  note?: string;
-  timestamp: Date;
+  name: string;
+  email: string;
+  avatar?: string;
 }
 
-export interface JournalEntry {
-  id: string;
-  title: string;
-  content: string;
-  createdAt: Date;
-  updatedAt: Date;
+export interface Settings {
+  darkMode: boolean;
+  notifications: boolean;
+  apiEndpoint: string;
+  userId?: string;
 }
 
-export interface UserSettings {
-  theme: 'light' | 'dark' | 'system';
-  chatbotTone: 'friendly' | 'professional' | 'comforting' | 'casual';
-  memoryEnabled: boolean;
-  accessibility: {
-    fontSize: 'normal' | 'large' | 'larger';
-    highContrast: boolean;
-  };
+// Store interface to match your existing store structure
+export interface StoreState {
+  // Sidebar state
+  isSidebarCollapsed: boolean;
+  toggleSidebarCollapse: () => void;
+  
+  // Chat state
+  chats: Chat[];
+  currentChat: Chat | null;
+  setCurrentChat: (chat: Chat | null) => void;
+  addMessage: (chatId: string, message: Message) => void;
+  createNewChat: (title?: string, isTherapySession?: boolean) => Chat;
+  renameChat: (chatId: string, newTitle: string) => void;
+  deleteChat: (chatId: string) => void;
+  
+  // Settings
+  settings: Settings;
+  updateSettings: (settings: Partial<Settings>) => void;
 }
 
-export interface DisclaimerStatus {
-  accepted: boolean;
-  acceptedAt?: Date;
+// API related types
+export interface TherapySessionInfo {
+  sessionId: string;
+  stage: 'initial' | 'assessment' | 'treatment';
+  interactionCount: number;
+  apiSource: string;
+}
+
+export interface ChatSession {
+  chatId: string;
+  therapyInfo?: TherapySessionInfo;
 }

@@ -470,31 +470,37 @@ const SettingsPage = () => {
       case 'appearance':
         return (
           <div className="space-y-6">
-          <h2 className="text-xl font-semibold mb-6 text-white">Appearance</h2>
-          <div className="flex gap-4">
-            <button
-              onClick={() => handleThemeChange('light')}
-              className={`flex-1 p-4 rounded-lg border-2 flex flex-col items-center gap-2 text-white ${
-                      settings.theme === 'light' ? 'border-primary-500 bg-gray-700' : 'border-gray-700 hover:bg-gray-700/50'
-              }`}
-            >
-                    <Sun className="h-6 w-6" /> <span>Light</span>
-            </button>
-            <button
-              onClick={() => handleThemeChange('dark')}
-              className={`flex-1 p-4 rounded-lg border-2 flex flex-col items-center gap-2 text-white ${
-                      settings.theme === 'dark' ? 'border-primary-500 bg-gray-700' : 'border-gray-700 hover:bg-gray-700/50'
-              }`}
-            >
-                    <Moon className="h-6 w-6" /> <span>Dark</span>
-            </button>
-            <button
-              onClick={() => handleThemeChange('system')}
-              className={`flex-1 p-4 rounded-lg border-2 flex flex-col items-center gap-2 text-white ${
-                      settings.theme === 'system' ? 'border-primary-500 bg-gray-700' : 'border-gray-700 hover:bg-gray-700/50'
+            <h2 className="text-xl font-semibold mb-6 text-gray-900 dark:text-white">Appearance</h2>
+            <div className="flex gap-4">
+              <button
+                onClick={() => handleThemeChange('light')}
+                className={`flex-1 p-4 rounded-lg border-2 flex flex-col items-center gap-2 transition-colors ${
+                  settings.theme === 'light' 
+                    ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20 text-primary-500' 
+                    : 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300'
                 }`}
               >
-                    <Monitor className="h-6 w-6" /> <span>System</span>
+                <Sun className="h-6 w-6" /> <span>Light</span>
+              </button>
+              <button
+                onClick={() => handleThemeChange('dark')}
+                className={`flex-1 p-4 rounded-lg border-2 flex flex-col items-center gap-2 transition-colors ${
+                  settings.theme === 'dark' 
+                    ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20 text-primary-500' 
+                    : 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300'
+                }`}
+              >
+                <Moon className="h-6 w-6" /> <span>Dark</span>
+              </button>
+              <button
+                onClick={() => handleThemeChange('system')}
+                className={`flex-1 p-4 rounded-lg border-2 flex flex-col items-center gap-2 transition-colors ${
+                  settings.theme === 'system' 
+                    ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20 text-primary-500' 
+                    : 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300'
+                }`}
+              >
+                <Monitor className="h-6 w-6" /> <span>System</span>
               </button>
             </div>
           </div>

@@ -34,15 +34,15 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   }, [isSidebarOpen, toggleSidebar]);
 
   return (
-    <div className="h-screen flex flex-col bg-gray-900">
+    <div className="h-screen flex flex-col bg-background-light dark:bg-background-dark">
       <MainHeader />
       <CrisisButton />
       
-      <div className="flex-1 flex overflow-hidden pt-16 bg-gray-900">
+      <div className="flex-1 flex overflow-hidden pt-16">
         {/* Sidebar Overlay */}
         {isSidebarOpen && (
           <div
-            className="fixed inset-0 bg-gray-900/20 backdrop-blur-sm md:hidden z-20"
+            className="fixed inset-0 bg-black/20 backdrop-blur-sm md:hidden z-20"
             aria-hidden="true"
           />
         )}
@@ -52,7 +52,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           className={`
             flex-1 relative w-full
             transition-[padding] duration-300 ease-in-out
-            bg-gray-50 dark:bg-gray-900
+            bg-background-light dark:bg-background-dark
             ${isSidebarCollapsed ? 'md:pl-16' : 'md:pl-64'}
           `}
         >
@@ -69,7 +69,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             transition-all duration-300 ease-in-out
             z-30
             h-[calc(100vh-4rem)]
-            bg-gray-900 border-r border-gray-800
+            bg-sidebar-light dark:bg-sidebar-dark border-r border-gray-200 dark:border-gray-800
           `}
         >
           <Sidebar />
